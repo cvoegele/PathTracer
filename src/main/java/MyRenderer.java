@@ -32,6 +32,7 @@ public class MyRenderer {
         Vec3 u = f.cross(r);
         r = r.normalize();
         u = u.normalize();
+        f = f.normalize();
 
         double FOVrad = FOV * (Math.PI / 180);
         double x = Pixel.x;
@@ -62,7 +63,7 @@ public class MyRenderer {
                 Sphere sphere = (Sphere) element;
 
                 //detect Hit-Points between this sphere and the ray
-                Vec3 CE = eye.subtract(sphere.getPosition());
+                Vec3 CE = r.getPosition().subtract(sphere.getPosition());
                 double a = r.getDirection().dot(r.getDirection());
                 double b = CE.scale(2).dot(r.getDirection());
                 double c = CE.length() * CE.length() - sphere.getRadius() * sphere.getRadius();
@@ -84,7 +85,7 @@ public class MyRenderer {
                     we have detected an intersection that is in front of the previous one.
                     */
                     if (chosenLambda != 0 && SmallestPositiveValue(chosenLambda, lambda) == chosenLambda) {
-                        closestPoint = eye.add(r.getDirection().scale((float) chosenLambda));
+                        closestPoint = r.getPosition().add(r.getDirection().scale((float) chosenLambda));
                         hitObject = sphere;
                         lambda = chosenLambda;
                         emission = sphere.getEmission();
@@ -93,7 +94,7 @@ public class MyRenderer {
                 } else if (ac4 == bb) {
                     lambda = -b / 2;
                     hitObject = sphere;
-                    closestPoint = eye.add(r.getDirection().scale((float) lambda));
+                    closestPoint = r.getPosition().add(r.getDirection().scale((float) lambda));
                     emission = sphere.getEmission();
                 }
                 //there are no hitpoints e.g do nothing
@@ -112,6 +113,7 @@ public class MyRenderer {
      */
     Vec3 ComputeColor(Scene s, Ray r) {
         HitPoint point = FindClosestHitPoint(s, r);
+
 
         if (point.getHitObject() == null) {
             return new Vec3(0, 0, 0);
@@ -132,15 +134,15 @@ public class MyRenderer {
 
             var normal = point.getNormal().normalize();
             var dotWnormal = w.dot(normal);
-            return normal;
-//            if (dotWnormal < 0) w = w.scale(-1);
-//
-//            var middle = BRDF(point).scale((float) (w.dot(normal) * (Math.PI / (1 - p))));
-//            var recursion = ComputeColor(s, new Ray(point.getPosition(), w));
-//            var x = point.getEmission().x + middle.x * recursion.x;
-//            var y = point.getEmission().y + middle.y * recursion.y;
-//            var z = point.getEmission().z + middle.z * recursion.z;
-//            return new Vec3(x, y, z);
+            //return normal;
+            if (dotWnormal < 0) w = w.scale(-1);
+
+            var middle = BRDF(point).scale((float) (w.dot(normal) * (2*Math.PI / (1 - p))));
+            var recursion = ComputeColor(s, new Ray(point.getPosition(), w));
+            var x = point.getEmission().x + middle.x * recursion.x;
+            var y = point.getEmission().y + middle.y * recursion.y;
+            var z = point.getEmission().z + middle.z * recursion.z;
+            return new Vec3(x, y, z);
         }
     }
 
