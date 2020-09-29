@@ -2,17 +2,20 @@ import util.Vec2;
 import util.Vec3;
 
 import java.util.List;
+import java.util.Random;
 
 public class MyRenderer {
 
     private Vec3 eye;
     private Vec3 lookAt;
     private double FOV;
+    private Random random;
 
     public MyRenderer(Vec3 eye, Vec3 lookAt, double FOV) {
         this.eye = eye;
         this.lookAt = lookAt;
         this.FOV = FOV;
+        random = new Random();
     }
 
     /**
@@ -25,13 +28,12 @@ public class MyRenderer {
      */
     Ray CreateEyeRay(Vec3 eye, Vec3 lookAt, double FOV, Vec2 Pixel) {
         Vec3 f = lookAt.subtract(eye);
-        Vec3 r = f.cross(new Vec3(0, 1, 0));
+        Vec3 r = (new Vec3(0, 1, 0)).cross(f);
         Vec3 u = f.cross(r);
         r = r.normalize();
         u = u.normalize();
-        f = f.normalize();
 
-        double FOVrad = FOV * Math.PI / 180;
+        double FOVrad = FOV * (Math.PI / 180);
         double x = Pixel.x;
         double y = Pixel.y;
         Vec3 d = f.add(r.scale((float) (x * Math.tan(FOVrad / 2)))).add(u.scale((float) (y * Math.tan(FOVrad / 2))));
@@ -53,13 +55,14 @@ public class MyRenderer {
         Vec3 closestPoint = Vec3.ZERO;
         SceneElement hitObject = null;
         double lambda = 0d;
+        Vec3 emission = Vec3.ZERO;
 
         for (SceneElement element : s.getObjects()) {
             if (element instanceof Sphere) {
                 Sphere sphere = (Sphere) element;
 
                 //detect Hit-Points between this sphere and the ray
-                Vec3 CE = sphere.getPosition().subtract(eye);
+                Vec3 CE = eye.subtract(sphere.getPosition());
                 double a = r.getDirection().dot(r.getDirection());
                 double b = CE.scale(2).dot(r.getDirection());
                 double c = CE.length() * CE.length() - sphere.getRadius() * sphere.getRadius();
@@ -71,8 +74,8 @@ public class MyRenderer {
                 if (ac4 < bb) {
 
                     //solve with quadratic formula
-                    double lambda1 = (-b + Math.sqrt(bb - ac4)) / 2;
-                    double lambda2 = (-b - Math.sqrt(bb - ac4)) / 2;
+                    double lambda1 = ((-b + Math.sqrt(bb - ac4)) / 2);
+                    double lambda2 = ((-b - Math.sqrt(bb - ac4)) / 2);
 
                     double chosenLambda = SmallestPositiveValue(lambda1, lambda2);
 
@@ -84,18 +87,20 @@ public class MyRenderer {
                         closestPoint = eye.add(r.getDirection().scale((float) chosenLambda));
                         hitObject = sphere;
                         lambda = chosenLambda;
+                        emission = sphere.getEmission();
                     }
                     //there is only one hitpoint
                 } else if (ac4 == bb) {
                     lambda = -b / 2;
                     hitObject = sphere;
                     closestPoint = eye.add(r.getDirection().scale((float) lambda));
+                    emission = sphere.getEmission();
                 }
                 //there are no hitpoints e.g do nothing
             }
         }
 
-        return new HitPoint(closestPoint, hitObject, lambda);
+        return new HitPoint(closestPoint, hitObject, lambda, emission);
     }
 
     /***
@@ -107,9 +112,40 @@ public class MyRenderer {
      */
     Vec3 ComputeColor(Scene s, Ray r) {
         HitPoint point = FindClosestHitPoint(s, r);
-        if (point.getHitObject() != null)
-            return point.getHitObject().getColor();
-        return new Vec3(1, 1, 1);
+
+        if (point.getHitObject() == null) {
+            return new Vec3(0, 0, 0);
+        }
+
+        double p = 0.2;
+        if (random.nextDouble() < p) {
+            return point.getEmission();
+        } else {
+            var w = Vec3.ONE.scale(2);
+            while (w.length() > 1) {
+                var x = (random.nextDouble() * 2) - 1;
+                var y = (random.nextDouble() * 2) - 1;
+                var z = (random.nextDouble() * 2) - 1;
+                w = new Vec3(x, y, z);
+            }
+            w = w.normalize();
+
+            var normal = point.getNormal().normalize();
+            var dotWnormal = w.dot(normal);
+            return normal;
+//            if (dotWnormal < 0) w = w.scale(-1);
+//
+//            var middle = BRDF(point).scale((float) (w.dot(normal) * (Math.PI / (1 - p))));
+//            var recursion = ComputeColor(s, new Ray(point.getPosition(), w));
+//            var x = point.getEmission().x + middle.x * recursion.x;
+//            var y = point.getEmission().y + middle.y * recursion.y;
+//            var z = point.getEmission().z + middle.z * recursion.z;
+//            return new Vec3(x, y, z);
+        }
+    }
+
+    Vec3 BRDF(HitPoint point) {
+        return point.getHitObject().getColor();
     }
 
     private double SmallestPositiveValue(double val1, double val2) {
