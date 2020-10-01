@@ -21,10 +21,10 @@ public class MyRenderer {
     /**
      * create ray that goes through the given pixel on the screen
      *
-     * @Param eye Eye-Position in the World
-     * @Param lookAt Position the eye looks at in the World
-     * @Param FOV field of View in Degrees
-     * @Param Pixel on the Screen in -1 ... 1 for both x and y. (0,0) is the middle of the screen
+     * @param  eye Eye-Position in the World
+     * @param lookAt Position the eye looks at in the World
+     * @param FOV field of View in Degrees
+     * @param Pixel on the Screen in -1 ... 1 for both x and y. (0,0) is the middle of the screen
      */
     Ray CreateEyeRay(Vec3 eye, Vec3 lookAt, double FOV, Vec2 Pixel) {
         Vec3 f = lookAt.subtract(eye);
@@ -100,6 +100,9 @@ public class MyRenderer {
                 //there are no hitpoints e.g do nothing
             }
         }
+        //nudge into opposite direction of ray a bit
+        var nudge = r.getDirection().scale(-1f * 1f/1000f);
+        closestPoint = closestPoint.add(nudge);
 
         return new HitPoint(closestPoint, hitObject, lambda, emission);
     }
@@ -119,7 +122,7 @@ public class MyRenderer {
             return new Vec3(0, 0, 0);
         }
 
-        double p = 0.2;
+        double p = 0.1;
         if (random.nextDouble() < p) {
             return point.getEmission();
         } else {
@@ -137,12 +140,16 @@ public class MyRenderer {
             //return normal;
             if (dotWnormal < 0) w = w.scale(-1);
 
-            var middle = BRDF(point).scale((float) (w.dot(normal) * (2*Math.PI / (1 - p))));
+            var middle = BRDF(point).scale((float) ((w.dot(normal) * (Math.PI / (1f - p)))));
             var recursion = ComputeColor(s, new Ray(point.getPosition(), w));
             var x = point.getEmission().x + middle.x * recursion.x;
             var y = point.getEmission().y + middle.y * recursion.y;
             var z = point.getEmission().z + middle.z * recursion.z;
-            return new Vec3(x, y, z);
+            return new Vec3(x,y,z);
+
+
+//            var coefficient = w.dot(normal) * (2 * Math.PI / (1 - p));
+//            return point.getEmission().add(BRDF(point).scale((float) coefficient)).pointWiseMult(ComputeColor(s, new Ray(point.getPosition(), w)));
         }
     }
 
