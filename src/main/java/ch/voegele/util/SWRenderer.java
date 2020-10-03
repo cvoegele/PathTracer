@@ -1,4 +1,4 @@
-package util;
+package ch.voegele.util;
 
 import java.awt.Color;
 import java.awt.Graphics;

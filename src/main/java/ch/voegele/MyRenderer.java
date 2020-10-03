@@ -1,7 +1,8 @@
-import util.Vec2;
-import util.Vec3;
+package ch.voegele;
 
-import java.util.List;
+import ch.voegele.util.Vec2;
+import ch.voegele.util.Vec3;
+
 import java.util.Random;
 
 public class MyRenderer {
@@ -42,7 +43,7 @@ public class MyRenderer {
     }
 
     /***
-     *  find closest Hitpoint in a Scene for a ray
+     *  find closest Hitpoint in a CornellBox.Scene for a ray
      *  SceneElements are currently only supported if they are Spheres
      *
      *  Primarily used for rays cast from the eye, but can also be used for other rays
@@ -108,10 +109,10 @@ public class MyRenderer {
     }
 
     /***
-     * Computes the Color of a Pixel inside of the Scene.
+     * Computes the Color of a Pixel inside of the CornellBox.Scene.
      * This method finds the closest hit point by calling FindClosestHitPoint
-     * @param s Scene with the SceneElments inside
-     * @param r Ray that is cast from the Eye
+     * @param s CornellBox.Scene with the SceneElments inside
+     * @param r CornellBox.Ray that is cast from the Eye
      * @return Vec3 representing Color in LinearRGB (0 ... 1)
      */
     Vec3 ComputeColor(Scene s, Ray r) {
@@ -149,7 +150,7 @@ public class MyRenderer {
 
 
 //            var coefficient = w.dot(normal) * (2 * Math.PI / (1 - p));
-//            return point.getEmission().add(BRDF(point).scale((float) coefficient)).pointWiseMult(ComputeColor(s, new Ray(point.getPosition(), w)));
+//            return point.getEmission().add(BRDF(point).scale((float) coefficient)).pointWiseMult(ComputeColor(s, new CornellBox.Ray(point.getPosition(), w)));
         }
     }
 

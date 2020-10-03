@@ -1,4 +1,4 @@
-package util;
+package ch.voegele.util;
 
 import javafx.scene.paint.Color;
 

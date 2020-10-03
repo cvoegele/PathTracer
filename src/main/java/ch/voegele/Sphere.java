@@ -1,5 +1,6 @@
-import javafx.scene.paint.Color;
-import util.Vec3;
+package ch.voegele;
+
+import ch.voegele.util.Vec3;
 
 public class Sphere implements SceneElement {
 
