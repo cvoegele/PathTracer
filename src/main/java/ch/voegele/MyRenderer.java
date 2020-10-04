@@ -111,11 +111,14 @@ public class MyRenderer {
     /***
      * Computes the Color of a Pixel inside of the CornellBox.Scene.
      * This method finds the closest hit point by calling FindClosestHitPoint
+     * Then bouncing in the screen until it terminates with a probability.
+     * The number of bounces is not deterministic.
+     *
      * @param s CornellBox.Scene with the SceneElments inside
      * @param r CornellBox.Ray that is cast from the Eye
      * @return Vec3 representing Color in LinearRGB (0 ... 1)
      */
-    Vec3 ComputeColor(Scene s, Ray r, int maxDepth, int depth) {
+    Vec3 ComputeColor(Scene s, Ray r) {
         HitPoint point = FindClosestHitPoint(s, r);
 
 
@@ -124,9 +127,7 @@ public class MyRenderer {
         }
 
         double p = 0.1;
-//        if (random.nextDouble() < p) {
-//            return point.getEmission();
-        if (maxDepth == depth){
+        if (random.nextDouble() < p) {
             return point.getEmission();
         } else {
             var w = Vec3.ONE.scale(2);
@@ -144,7 +145,58 @@ public class MyRenderer {
             if (dotWnormal < 0) w = w.scale(-1);
 
             var middle = BRDF(point).scale((float) ((w.dot(normal) * (Math.PI / (1f - p)))));
-            var recursion = ComputeColor(s, new Ray(point.getPosition(), w), maxDepth, depth+1);
+            var recursion = ComputeColor(s, new Ray(point.getPosition(), w));
+            var x = point.getEmission().x + middle.x * recursion.x;
+            var y = point.getEmission().y + middle.y * recursion.y;
+            var z = point.getEmission().z + middle.z * recursion.z;
+            return new Vec3(x,y,z);
+
+
+//            var coefficient = w.dot(normal) * (2 * Math.PI / (1 - p));
+//            return point.getEmission().add(BRDF(point).scale((float) coefficient)).pointWiseMult(ComputeColor(s, new CornellBox.Ray(point.getPosition(), w)));
+        }
+    }/***
+     * Computes the Color of a Pixel inside of the CornellBox.Scene.
+     * This method finds the closest hit point by calling FindClosestHitPoint
+     * Then bouncing in the scene in a random direction @bounces times
+     * The number of bounces is deterministic.
+     *
+     * @param s CornellBox.Scene with the SceneElments inside
+     * @param r CornellBox.Ray that is cast from the Eye
+     * @param bounces the maximum bounces the render does before it returns the color
+     * @param bounce the number of bounce it is on right now. To start render pass 0.
+     * @return Vec3 representing Color in LinearRGB (0 ... 1)
+     */
+    Vec3 ComputeColor(Scene s, Ray r, int bounces, int bounce) {
+        HitPoint point = FindClosestHitPoint(s, r);
+
+
+        if (point.getHitObject() == null) {
+            return new Vec3(0, 0, 0);
+        }
+
+        double p = 0.1;
+//        if (random.nextDouble() < p) {
+//            return point.getEmission();
+        if (bounces == bounce){
+            return point.getEmission();
+        } else {
+            var w = Vec3.ONE.scale(2);
+            while (w.length() > 1) {
+                var x = (random.nextDouble() * 2) - 1;
+                var y = (random.nextDouble() * 2) - 1;
+                var z = (random.nextDouble() * 2) - 1;
+                w = new Vec3(x, y, z);
+            }
+            w = w.normalize();
+
+            var normal = point.getNormal().normalize();
+            var dotWnormal = w.dot(normal);
+            //return normal;
+            if (dotWnormal < 0) w = w.scale(-1);
+
+            var middle = BRDF(point).scale((float) ((w.dot(normal) * (Math.PI / (1f - p)))));
+            var recursion = ComputeColor(s, new Ray(point.getPosition(), w), bounces, bounce+1);
             var x = point.getEmission().x + middle.x * recursion.x;
             var y = point.getEmission().y + middle.y * recursion.y;
             var z = point.getEmission().z + middle.z * recursion.z;
@@ -155,6 +207,8 @@ public class MyRenderer {
 //            return point.getEmission().add(BRDF(point).scale((float) coefficient)).pointWiseMult(ComputeColor(s, new CornellBox.Ray(point.getPosition(), w)));
         }
     }
+
+
 
     Vec3 BRDF(HitPoint point) {
         return point.getHitObject().getColor();
