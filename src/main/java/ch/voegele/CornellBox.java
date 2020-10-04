@@ -3,6 +3,7 @@ package ch.voegele;
 import ch.voegele.util.Vec2;
 import ch.voegele.util.Vec3;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableArrayBase;
 import javafx.scene.image.ImageView;
@@ -25,13 +26,16 @@ public class CornellBox extends Application {
     Vec3 eye = new Vec3(0, 0, -4);
     Vec3 lookAt = new Vec3(0, 0, 6);
     double FOV = 36;
-    static int numberOfThreads = 1;
-    static int sampleRate = 1;
+    static int numberOfThreads = 4;
+    static int sampleRate = 32;
+    static int bounces = 10;
 
     private PixelWriter writer;
     private Vec3[][] imageArray;
 
     Scene scene;
+    private Thread[] threads;
+    private long startTime;
 
     public static void main(String[] args) {
         if (args.length > 0) {
@@ -39,6 +43,7 @@ public class CornellBox extends Application {
             var splits = input.split("-");
             numberOfThreads = Integer.parseInt(splits[0]);
             sampleRate = Integer.parseInt(splits[1]);
+            bounces = Integer.parseInt(splits[2]);
         } else {
             numberOfThreads = 4;
             sampleRate = 10;
@@ -48,6 +53,8 @@ public class CornellBox extends Application {
 
     @Override
     public void start(Stage primaryStage) throws InterruptedException {
+        startTime = System.currentTimeMillis();
+
         initScene();
         ImageView view = RenderCornellBox(sampleRate, numberOfThreads);
         javafx.scene.Scene scene = new javafx.scene.Scene(new VBox(view), width, height);
@@ -56,6 +63,8 @@ public class CornellBox extends Application {
 
         Timer timer = new Timer();
         timer.schedule(new UpdateWindow(), 1000, 2000);
+
+
     }
 
     private void initScene() {
@@ -81,13 +90,14 @@ public class CornellBox extends Application {
         imageArray = new Vec3[height][width];
 
         //go through all pixels
-        var parts = height/numberOfThreads;
-        var threads = new Thread[numberOfThreads];
+        var parts = height / numberOfThreads;
+        threads = new Thread[numberOfThreads];
         for (int partIndex = 0; partIndex < numberOfThreads; partIndex++) {
             var start = parts * partIndex;
             var end = parts * partIndex + parts;
 
-            threads[partIndex] = new Thread(()->{
+            int finalPartIndex = partIndex;
+            threads[partIndex] = new Thread(() -> {
                 for (int v = start; v < end; v++) {
                     for (int u = 0; u < width; u++) {
                         double y = (((double) v / height) * 2) - 1;
@@ -96,7 +106,7 @@ public class CornellBox extends Application {
                         Vec3[] colors = new Vec3[sampleRate];
                         for (int i = 0; i < sampleRate; i++) {
                             Ray ray = renderer.CreateEyeRay(eye, lookAt, FOV, new Vec2(x, y));
-                            Vec3 color = renderer.ComputeColor(scene, ray);
+                            Vec3 color = renderer.ComputeColor(scene, ray, bounces, 0);
                             colors[i] = color;
                         }
                         Vec3 sum = new Vec3(0, 0, 0);
@@ -117,6 +127,9 @@ public class CornellBox extends Application {
 
                     }
                 }
+
+                var endTime = System.currentTimeMillis() - startTime;
+                System.out.println("Full time used in Thread "+ finalPartIndex +" in s: " + endTime / 1000);
             });
             threads[partIndex].start();
         }
@@ -132,9 +145,11 @@ public class CornellBox extends Application {
         public void run() {
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
-                    var finalColor = imageArray[j][i];
-                    if (finalColor != null)
-                        writer.setColor(j, i, Color.rgb(clamp(finalColor.x), clamp(finalColor.y), clamp(finalColor.z)));
+                    int finalJ = j;
+                    int finalI = i;
+                        var finalColor = imageArray[finalJ][finalI];
+                        if (finalColor != null)
+                            writer.setColor(finalJ, finalI, Color.rgb(clamp(finalColor.x), clamp(finalColor.y), clamp(finalColor.z)));
                 }
             }
         }

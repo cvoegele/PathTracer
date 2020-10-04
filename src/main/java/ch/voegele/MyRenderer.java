@@ -115,7 +115,7 @@ public class MyRenderer {
      * @param r CornellBox.Ray that is cast from the Eye
      * @return Vec3 representing Color in LinearRGB (0 ... 1)
      */
-    Vec3 ComputeColor(Scene s, Ray r) {
+    Vec3 ComputeColor(Scene s, Ray r, int maxDepth, int depth) {
         HitPoint point = FindClosestHitPoint(s, r);
 
 
@@ -124,7 +124,9 @@ public class MyRenderer {
         }
 
         double p = 0.1;
-        if (random.nextDouble() < p) {
+//        if (random.nextDouble() < p) {
+//            return point.getEmission();
+        if (maxDepth == depth){
             return point.getEmission();
         } else {
             var w = Vec3.ONE.scale(2);
@@ -142,7 +144,7 @@ public class MyRenderer {
             if (dotWnormal < 0) w = w.scale(-1);
 
             var middle = BRDF(point).scale((float) ((w.dot(normal) * (Math.PI / (1f - p)))));
-            var recursion = ComputeColor(s, new Ray(point.getPosition(), w));
+            var recursion = ComputeColor(s, new Ray(point.getPosition(), w), maxDepth, depth+1);
             var x = point.getEmission().x + middle.x * recursion.x;
             var y = point.getEmission().y + middle.y * recursion.y;
             var z = point.getEmission().z + middle.z * recursion.z;
