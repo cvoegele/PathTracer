@@ -7,12 +7,19 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-}
-
 javafx {
     version = "13"
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
-mainClassName = 'Main'
+mainClassName = 'ch.voegele.Main'
+
+jar {
+    manifest {
+        attributes "Main-Class": "ch.voegele.Main"
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

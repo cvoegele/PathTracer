@@ -1,4 +1,4 @@
-package util;/*
+package ch.voegele.util;/*
  * Copyright (c) 2013 - 2016 Stefan Muller Arisona, Simon Schubiger
  * Copyright (c) 2013 - 2016 FHNW & ETH Zurich
  * All rights reserved.
@@ -32,50 +32,30 @@ package util;/*
 import java.util.Collection;
 
 /**
- * 4D vector for basic vector algebra. Instances are immutable.
+ * 2D vector for basic vector algebra. Instances are immutable.
  *
  * @author radar
  */
-public final class Vec4 {
-	public static final Vec4 ZERO = new Vec4(0, 0, 0, 0);
-	public static final Vec4 ONE = new Vec4(1, 1, 1, 1);
-	public static final Vec4 X = new Vec4(1, 0, 0, 0);
-	public static final Vec4 Y = new Vec4(0, 1, 0, 0);
-	public static final Vec4 Z = new Vec4(0, 0, 1, 0);
-	public static final Vec4 W = new Vec4(0, 0, 0, 1);
-	public static final Vec4 X_NEG = new Vec4(-1, 0, 0);
-	public static final Vec4 Y_NEG = new Vec4(0, -1, 0, 0);
-	public static final Vec4 Z_NEG = new Vec4(0, 0, -1, 0);
-	public static final Vec4 W_NEG = new Vec4(0, 0, 0, -1);
+public final class Vec2 {
+	public static final Vec2 ZERO = new Vec2(0, 0);
+	public static final Vec2 ONE = new Vec2(1, 1);
+	public static final Vec2 X = new Vec2(1, 0);
+	public static final Vec2 Y = new Vec2(0, 1);
+	public static final Vec2 X_NEG = new Vec2(-1, 0);
+	public static final Vec2 Y_NEG = new Vec2(0, -1);
 
 	public final float x;
 	public final float y;
-	public final float z;
-	public final float w;
 
-	public Vec4(float x, float y, float z, float w) {
+	public Vec2(float x, float y) {
 		this.x = x;
 		this.y = y;
-		this.z = z;
-		this.w = w;
 	}
 
-	public Vec4(double x, double y, double z, double w) {
-		this((float) x, (float) y, (float) z, (float) w);
+	public Vec2(double x, double y) {
+		this((float) x, (float) y);
 	}
-
-	public Vec4(float x, float y, float z) {
-		this(x, y, z, 1);
-	}
-
-	public Vec4(double x, double y, double z) {
-		this((float) x, (float) y, (float) z);
-	}
-
-	public Vec4(Vec3 v) {
-		this(v.x, v.y, v.z, 1);
-	}
-
+	
 	public float x() {
 		return x;
 	}
@@ -84,95 +64,85 @@ public final class Vec4 {
 		return y;
 	}
 
-	public float z() {
-		return z;
-	}
-
-	public float w() {
-		return w;
-	}
-
 	public boolean isZero() {
 		return MathUtilities.isZero(lengthSquared());
 	}
 
 	public float length() {
-		return MathUtilities.length(x, y, z, w);
+		return MathUtilities.length(x, y);
 	}
 
 	public float lengthSquared() {
-		return MathUtilities.lengthSquared(x, y, z, w);
+		return MathUtilities.lengthSquared(x, y);
 	}
 
-	public float distance(Vec4 v) {
-		return (float) Math.sqrt((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y) + (v.z - z) * (v.z - z) + (v.w - w) * (v.w - w));
+	public float distance(Vec2 v) {
+		return (float) Math.sqrt((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y));
 	}
 
-	public Vec4 add(Vec4 v) {
-		return new Vec4(x + v.x, y + v.y, z + v.z, w + v.w);
+	public Vec2 add(Vec2 v) {
+		return new Vec2(x + v.x, y + v.y);
 	}
 
-	public Vec4 subtract(Vec4 v) {
-		return new Vec4(x - v.x, y - v.y, z - v.z, w - v.w);
+	public Vec2 subtract(Vec2 v) {
+		return new Vec2(x - v.x, y - v.y);
 	}
 
-	public Vec4 scale(float s) {
-		return new Vec4(x * s, y * s, z * s, w * s);
+	public Vec2 scale(float s) {
+		return new Vec2(x * s, y * s);
 	}
 
-	public Vec4 negate() {
+	public Vec2 negate() {
 		return scale(-1);
 	}
 
-	public Vec4 normalize() {
+	public Vec2 normalize() {
 		float l = length();
 		if (MathUtilities.isZero(l) || l == 1)
 			return this;
-		return new Vec4(x / l, y / l, z / l, w / l);
+		return new Vec2(x / l, y / l);
 	}
 
-	public float dot(Vec4 v) {
-		return MathUtilities.dot(x, y, z, w, v.x, v.y, v.z, v.w);
+	public float dot(Vec2 v) {
+		return MathUtilities.dot(x, y, v.x, v.y);
 	}
-
-	public Vec4 toVec4() {
+	
+	public float angle(Vec2 v) {
+		return MathUtilities.RADIANS_TO_DEGREES * (float)Math.acos(dot(v) / length() * v.length());		
+	}
+	
+	public Vec2 toVec2() {
 		return this;
 	}
 
 	public float[] toArray() {
-		return new float[] { x, y, z, w };
+		return new float[] { x, y };
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof Vec4))
+		if (!(obj instanceof Vec2))
 			return false;
-		Vec4 v = (Vec4) obj;
-		return x == v.x && y == v.y && z == v.z && w == v.w;
+		Vec2 v = (Vec2) obj;
+		return x == v.x && y == v.y;
 	}
 	
 	@Override
 	public String toString() {
-		return "[" + x + ", " + y + ", " + z + ", " + w + "]";
+		return "[" + x + ", " + y + "]";
 	}
-	
-	public static Vec4 lerp(Vec4 v0, Vec4 v1, float t) {
-		return new Vec4(MathUtilities.lerp(v0.x, v1.x, t), MathUtilities.lerp(v0.y, v1.y, t), MathUtilities.lerp(v0.z, v1.z, t), MathUtilities.lerp(v0.w, v1.w, t));
-	}	
 
-	public static float[] toArray(Collection<Vec4> vectors) {
+	public static float[] toArray(Collection<Vec2> vectors) {
 		if (vectors == null)
 			return null;
 
-		float[] result = new float[vectors.size() * 4];
+		float[] result = new float[2 * vectors.size()];
 		int i = 0;
-		for (Vec4 v : vectors) {
+		for (Vec2 v : vectors) {
 			result[i++] = v.x;
 			result[i++] = v.y;
-			result[i++] = v.z;
-			result[i++] = v.w;
 		}
 		return result;
 	}

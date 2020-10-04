@@ -1,3 +1,5 @@
+package ch.voegele;
+
 public class Scene {
 
     private SceneElement[] objects;
