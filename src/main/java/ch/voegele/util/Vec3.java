@@ -100,6 +100,10 @@ public final class Vec3 {
         return new Vec3(x - v.x, y - v.y, z - v.z);
     }
 
+    public Vec3 subtract(float f) {
+        return new Vec3(x - f, y - f, z - f);
+    }
+
     public Vec3 scale(float s) {
         return new Vec3(x * s, y * s, z * s);
     }

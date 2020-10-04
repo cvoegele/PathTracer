@@ -58,14 +58,14 @@ public class CornellBox {
 
 
     private void initScene() {
-        Sphere left = new Sphere(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), new Vec3(0, 0, 0));
-        Sphere right = new Sphere(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), new Vec3(0, 0, 0));
-        Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0));
-        Sphere bot = new Sphere(new Vec3(0, 1001, 0), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0));
-        Sphere top = new Sphere(new Vec3(0, -1001, 0), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(1, 1, 1).scale(5));
-        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.42, 0.42, 0), new Vec3(0, 0, 0));
+        Sphere left = new Sphere(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), new Vec3(0, 0, 0), Vec3.ZERO);
+        Sphere right = new Sphere(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
+        Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
+        Sphere bot = new Sphere(new Vec3(0, 1001, 0), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
+        Sphere top = new Sphere(new Vec3(0, -1001, 0), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(1, 1, 1).scale(5), Vec3.ZERO);
+        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.42, 0.42, 0), new Vec3(0, 0, 0), new Vec3(0.1, 0.1, 0.1));
 //        CornellBox.Sphere yellowBall2 = new CornellBox.Sphere(new Vec3(-0.6, 0.7, 0.5), 0.3f, new Vec3(0, 0.9, 0.9));
-        Sphere lightBlueBall = new Sphere(new Vec3(0.3, 0.4, 0.3), 0.6f, new Vec3(0, 0.4, 0.4), new Vec3(0, 0, 0));
+        Sphere lightBlueBall = new Sphere(new Vec3(0.3, 0.4, 0.3), 0.6f, new Vec3(0, 0.4, 0.4), new Vec3(0, 0, 0), new Vec3(0.1, 0.1, 0.1));
 //        CornellBox.Sphere lightBlueBall = new CornellBox.Sphere(new Vec3(0, 0, 0.3), 0.6f, new Vec3(0, 0.7, 0.7),new Vec3(0,0,0));
 
         scene = new Scene(new SceneElement[]{left, right, back, bot, top, yellowBall, lightBlueBall});
@@ -115,7 +115,6 @@ public class CornellBox {
                         var red = sum.x / (double) sampleRate;
                         var blue = sum.z / (double) sampleRate;
                         var green = sum.y / (double) sampleRate;
-
 //                red = Math.pow(red, 1 / 22d);
 //                blue = Math.pow(blue, 1 / 22d);
 //                green = Math.pow(green, 1 / 22d);

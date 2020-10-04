@@ -26,9 +26,9 @@ public class Main extends Application {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        var numberOfThreads = 1;
-        var sampleRate = 32;
-        var bounces = -1;
+        var numberOfThreads = 0;
+        var sampleRate = 0;
+        var bounces = 0;
 
         //read arguments
         if (args.length > 0) {
@@ -75,7 +75,7 @@ public class Main extends Application {
             if ("-sampleRate".equals(argument.getKey()))
                 return Integer.parseInt(argument.getValue());
         }
-        return 1;
+        return 32;
     }
 
     private static int readBounces(Pair<String, String>[] arguments) {
@@ -83,7 +83,7 @@ public class Main extends Application {
             if ("-sampleRate".equals(argument.getKey()))
                 return Integer.parseInt(argument.getValue());
         }
-        return 1;
+        return -1;
     }
 
 

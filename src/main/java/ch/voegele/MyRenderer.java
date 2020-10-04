@@ -5,6 +5,7 @@ import ch.voegele.util.Vec3;
 
 import java.util.Random;
 
+
 public class MyRenderer {
 
     private Vec3 eye;
@@ -22,10 +23,10 @@ public class MyRenderer {
     /**
      * create ray that goes through the given pixel on the screen
      *
-     * @param  eye Eye-Position in the World
+     * @param eye    Eye-Position in the World
      * @param lookAt Position the eye looks at in the World
-     * @param FOV field of View in Degrees
-     * @param Pixel on the Screen in -1 ... 1 for both x and y. (0,0) is the middle of the screen
+     * @param FOV    field of View in Degrees
+     * @param Pixel  on the Screen in -1 ... 1 for both x and y. (0,0) is the middle of the screen
      */
     Ray CreateEyeRay(Vec3 eye, Vec3 lookAt, double FOV, Vec2 Pixel) {
         Vec3 f = lookAt.subtract(eye);
@@ -102,10 +103,10 @@ public class MyRenderer {
             }
         }
         //nudge into opposite direction of ray a bit
-        var nudge = r.getDirection().scale(-1f * 1f/1000f);
+        var nudge = r.getDirection().scale(-1f * 1f / 1000f);
         closestPoint = closestPoint.add(nudge);
 
-        return new HitPoint(closestPoint, hitObject, lambda, emission);
+        return new HitPoint(closestPoint, hitObject, lambda, emission, r);
     }
 
     /***
@@ -144,18 +145,17 @@ public class MyRenderer {
             //return normal;
             if (dotWnormal < 0) w = w.scale(-1);
 
-            var middle = BRDF(point).scale((float) ((w.dot(normal) * (Math.PI / (1f - p)))));
+            var middle = BRDF(point, r, w).scale((float) ((w.dot(normal) * (Math.PI / (1f - p)))));
             var recursion = ComputeColor(s, new Ray(point.getPosition(), w));
             var x = point.getEmission().x + middle.x * recursion.x;
             var y = point.getEmission().y + middle.y * recursion.y;
             var z = point.getEmission().z + middle.z * recursion.z;
-            return new Vec3(x,y,z);
+            return new Vec3(x, y, z);
 
-
-//            var coefficient = w.dot(normal) * (2 * Math.PI / (1 - p));
-//            return point.getEmission().add(BRDF(point).scale((float) coefficient)).pointWiseMult(ComputeColor(s, new CornellBox.Ray(point.getPosition(), w)));
         }
-    }/***
+    }
+
+    /***
      * Computes the Color of a Pixel inside of the CornellBox.Scene.
      * This method finds the closest hit point by calling FindClosestHitPoint
      * Then bouncing in the scene in a random direction @bounces times
@@ -178,7 +178,7 @@ public class MyRenderer {
         double p = 0.1;
 //        if (random.nextDouble() < p) {
 //            return point.getEmission();
-        if (bounces == bounce){
+        if (bounces == bounce) {
             return point.getEmission();
         } else {
             var w = Vec3.ONE.scale(2);
@@ -195,23 +195,29 @@ public class MyRenderer {
             //return normal;
             if (dotWnormal < 0) w = w.scale(-1);
 
-            var middle = BRDF(point).scale((float) ((w.dot(normal) * (Math.PI / (1f - p)))));
-            var recursion = ComputeColor(s, new Ray(point.getPosition(), w), bounces, bounce+1);
+            var middle = BRDF(point, r, w).scale((float) ((w.dot(normal) * (Math.PI / (1f - p)))));
+            var recursion = ComputeColor(s, new Ray(point.getPosition(), w), bounces, bounce + 1);
             var x = point.getEmission().x + middle.x * recursion.x;
             var y = point.getEmission().y + middle.y * recursion.y;
             var z = point.getEmission().z + middle.z * recursion.z;
-            return new Vec3(x,y,z);
-
-
-//            var coefficient = w.dot(normal) * (2 * Math.PI / (1 - p));
-//            return point.getEmission().add(BRDF(point).scale((float) coefficient)).pointWiseMult(ComputeColor(s, new CornellBox.Ray(point.getPosition(), w)));
+            return new Vec3(x, y, z);
         }
     }
 
 
+    Vec3 BRDF(HitPoint point, Ray r, Vec3 w) {
+        var epsilon = 0.1;
+        var mu = 5;
 
-    Vec3 BRDF(HitPoint point) {
-        return point.getHitObject().getColor();
+        var normal = point.getNormal().normalize();
+        var d = r.getDirection();
+        var reflection = d.subtract(normal.scale(normal.dot(d)).scale(2));
+        var wDotD = w.dot(reflection);
+        if (wDotD > 1 - epsilon) {
+            return point.getHitObject().getColor().add(point.getHitObject().getSpecularColor().scale(mu));
+        } else {
+            return point.getHitObject().getColor();
+        }
     }
 
     private double SmallestPositiveValue(double val1, double val2) {
