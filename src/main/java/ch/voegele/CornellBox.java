@@ -112,8 +112,9 @@ public class CornellBox {
                             sum = sum.add(colors[i]);
                         }
 
-                Vec3 finalColor = new Vec3(red * 255, green * 255, blue * 255);
-
+                        var red = sum.x / (double) sampleRate;
+                        var blue = sum.z / (double) sampleRate;
+                        var green = sum.y / (double) sampleRate;
 //                red = Math.pow(red, 1 / 22d);
 //                blue = Math.pow(blue, 1 / 22d);
 //                green = Math.pow(green, 1 / 22d);

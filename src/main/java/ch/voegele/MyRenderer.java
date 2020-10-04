@@ -5,6 +5,7 @@ import ch.voegele.util.Vec3;
 
 import java.util.Random;
 
+
 public class MyRenderer {
 
     private Vec3 eye;
@@ -205,8 +206,8 @@ public class MyRenderer {
 
 
     Vec3 BRDF(HitPoint point, Ray r, Vec3 w) {
-        var epsilon = 0.5;
-        var mu = 2;
+        var epsilon = 0.1;
+        var mu = 5;
 
         var normal = point.getNormal().normalize();
         var d = r.getDirection();
