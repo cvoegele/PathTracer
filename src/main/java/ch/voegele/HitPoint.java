@@ -8,13 +8,15 @@ public class HitPoint {
     private final SceneElement hitObject;
     private final double lambda;
     private final Vec3 emission;
+    private final Ray ray;
 
 
-    public HitPoint(Vec3 position, SceneElement hitObject, double lambda, Vec3 emission) {
+    public HitPoint(Vec3 position, SceneElement hitObject, double lambda, Vec3 emission, Ray ray) {
         this.position = position;
         this.hitObject = hitObject;
         this.lambda = lambda;
         this.emission = emission;
+        this.ray = ray;
     }
 
     public Vec3 getPosition() {
@@ -35,5 +37,9 @@ public class HitPoint {
 
     public Vec3 getNormal() {
         return getPosition().subtract(getHitObject().getPosition());
+    }
+
+    public Ray getRay() {
+        return ray;
     }
 }
