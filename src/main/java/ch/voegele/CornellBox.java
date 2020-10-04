@@ -12,8 +12,8 @@ import javafx.stage.Stage;
 
 public class CornellBox extends Application {
 
-    private int width = 480;
-    private int height = 480;
+    private final int width = 480;
+    private final int height = 480;
 
     Vec3 eye = new Vec3(0, 0, -4);
     Vec3 lookAt = new Vec3(0, 0, 6);
@@ -28,7 +28,7 @@ public class CornellBox extends Application {
     @Override
     public void start(Stage primaryStage) {
         initScene();
-        ImageView view = RenderCornellBox(4096, 24);
+        ImageView view = RenderCornellBox(1);
         javafx.scene.Scene scene = new javafx.scene.Scene(new VBox(view), width, height);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -49,51 +49,38 @@ public class CornellBox extends Application {
 //        scene = new CornellBox.Scene(new CornellBox.SceneElement[]{ lightBlueBall});
     }
 
-    private ImageView RenderCornellBox(int sampleRate, int numberOfThreads) {
+    private ImageView RenderCornellBox(int sampleRate) {
         WritableImage image = new WritableImage(width, height);
         PixelWriter writer = image.getPixelWriter();
 
         MyRenderer renderer = new MyRenderer(eye, lookAt, FOV);
 
         //go through all pixels
-        var parts = height/numberOfThreads;
-        for (int partIndex = 0; partIndex < numberOfThreads; partIndex++) {
-            var start = parts * partIndex;
-            var end = parts * partIndex + parts;
+        for (int v = 0; v < height; v++) {
+            for (int u = 0; u < width; u++) {
+                double y = (((double) v / height) * 2) - 1;
+                double x = (((double) u / width) * 2) - 1;
 
-            Thread t = new Thread(()->{
-                for (int v = start; v < end; v++) {
-                    for (int u = 0; u < width; u++) {
-                        double y = (((double) v / height) * 2) - 1;
-                        double x = (((double) u / width) * 2) - 1;
-
-                        Vec3[] colors = new Vec3[sampleRate];
-                        for (int i = 0; i < sampleRate; i++) {
-                            Ray ray = renderer.CreateEyeRay(eye, lookAt, FOV, new Vec2(x, y));
-                            Vec3 color = renderer.ComputeColor(scene, ray);
-                            colors[i] = color;
-                        }
-                        Vec3 sum = new Vec3(0, 0, 0);
-                        for (int i = 0; i < sampleRate; i++) {
-                            sum = sum.add(colors[i]);
-                        }
-
-                        var red = sum.x / (double) sampleRate;
-                        var blue = sum.z / (double) sampleRate;
-                        var green = sum.y / (double) sampleRate;
-
-//                red = Math.pow(red, 1 / 22d);
-//                blue = Math.pow(blue, 1 / 22d);
-//                green = Math.pow(green, 1 / 22d);
-                        Vec3 finalColor = new Vec3(red * 255, green * 255, blue * 255);
-
-                        writer.setColor(u, v, Color.rgb(clamp(finalColor.x), clamp(finalColor.y), clamp(finalColor.z)));
-                    }
+                Vec3[] colors = new Vec3[sampleRate];
+                for (int i = 0; i < sampleRate; i++) {
+                    Ray ray = renderer.CreateEyeRay(eye, lookAt, FOV, new Vec2(x, y));
+                    Vec3 color = renderer.ComputeColor(scene, ray);
+                    colors[i] = color;
                 }
-            });
-            t.start();
-        }
+                Vec3 sum = new Vec3(0, 0, 0);
+                for (int i = 0; i < sampleRate; i++) {
+                    sum = sum.add(colors[i]);
+                }
 
+                var red = sum.x / (double) sampleRate;
+                var blue = sum.z / (double) sampleRate;
+                var green = sum.y / (double) sampleRate;
+
+                Vec3 finalColor = new Vec3(red * 255, green * 255, blue * 255);
+
+                writer.setColor(u, v, Color.rgb(clamp(finalColor.x), clamp(finalColor.y), clamp(finalColor.z)));
+            }
+        }
 
 
         ImageView view = new ImageView();
