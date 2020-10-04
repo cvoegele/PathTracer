@@ -12,12 +12,25 @@ public class Main extends Application {
 
     private static CornellBox box;
 
-
+    /***
+     * Possible Commandline Arguments:
+     * -threads     number of Threads the program should create to render the image
+     * -sampleRate  the number of Rays that are being shot per pixel
+     * -bounces     the number of bounces per single ray
+     *
+     * All Arguments are optional. If left blank these Standard Values are taken
+     * threads = 1
+     * sampleRate = 32
+     * bounces = 5
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         var numberOfThreads = 1;
-        var sampleRate = 4;
-        var bounces = 10;
+        var sampleRate = 32;
+        var bounces = 5;
 
+        //read arguments
         if (args.length > 0) {
             var splits = new String[args.length * 2];
             for (int i = 0; i < args.length; i++) {
@@ -38,6 +51,7 @@ public class Main extends Application {
             bounces = readBounces(arguments);
         }
 
+        //create RenderBox
         box = new CornellBox(numberOfThreads, sampleRate, bounces);
         launch(args);
     }
