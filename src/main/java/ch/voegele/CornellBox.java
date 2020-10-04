@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class CornellBox extends Application {
+public class CornellBox {
 
     private int width = 480;
     private int height = 480;
@@ -26,9 +26,9 @@ public class CornellBox extends Application {
     Vec3 eye = new Vec3(0, 0, -4);
     Vec3 lookAt = new Vec3(0, 0, 6);
     double FOV = 36;
-    static int numberOfThreads = 4;
-    static int sampleRate = 32;
-    static int bounces = 10;
+    int numberOfThreads;
+    int sampleRate;
+    int bounces;
 
     private PixelWriter writer;
     private Vec3[][] imageArray;
@@ -37,35 +37,25 @@ public class CornellBox extends Application {
     private Thread[] threads;
     private long startTime;
 
-    public static void main(String[] args) {
-        if (args.length > 0) {
-            var input = args[0];
-            var splits = input.split("-");
-            numberOfThreads = Integer.parseInt(splits[0]);
-            sampleRate = Integer.parseInt(splits[1]);
-            bounces = Integer.parseInt(splits[2]);
-        } else {
-            numberOfThreads = 4;
-            sampleRate = 10;
-        }
-        launch(args);
+
+    public CornellBox(int numberOfThreads, int sampleRate, int bounces) {
+        this.numberOfThreads = numberOfThreads;
+        this.sampleRate = sampleRate;
+        this.bounces = bounces;
     }
 
-    @Override
-    public void start(Stage primaryStage) throws InterruptedException {
+    public javafx.scene.Scene startRender() throws InterruptedException {
         startTime = System.currentTimeMillis();
-
         initScene();
-        ImageView view = RenderCornellBox(sampleRate, numberOfThreads);
-        javafx.scene.Scene scene = new javafx.scene.Scene(new VBox(view), width, height);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+
+        var view = RenderCornellBox(sampleRate, numberOfThreads);
 
         Timer timer = new Timer();
         timer.schedule(new UpdateWindow(), 1000, 2000);
 
-
+        return new javafx.scene.Scene(new VBox(view), width, height);
     }
+
 
     private void initScene() {
         Sphere left = new Sphere(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), new Vec3(0, 0, 0));
@@ -123,13 +113,11 @@ public class CornellBox extends Application {
 //                green = Math.pow(green, 1 / 22d);
                         Vec3 finalColor = new Vec3(red * 255, green * 255, blue * 255);
                         imageArray[u][v] = finalColor;
-                        //writer.setColor(u, v, Color.rgb(clamp(finalColor.x), clamp(finalColor.y), clamp(finalColor.z)));
-
                     }
                 }
 
                 var endTime = System.currentTimeMillis() - startTime;
-                System.out.println("Full time used in Thread "+ finalPartIndex +" in s: " + endTime / 1000);
+                System.out.println("Full time used in Thread " + finalPartIndex + " in s: " + endTime / 1000);
             });
             threads[partIndex].start();
         }
@@ -140,16 +128,15 @@ public class CornellBox extends Application {
     }
 
     private class UpdateWindow extends TimerTask {
-
         @Override
         public void run() {
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
                     int finalJ = j;
                     int finalI = i;
-                        var finalColor = imageArray[finalJ][finalI];
-                        if (finalColor != null)
-                            writer.setColor(finalJ, finalI, Color.rgb(clamp(finalColor.x), clamp(finalColor.y), clamp(finalColor.z)));
+                    var finalColor = imageArray[finalJ][finalI];
+                    if (finalColor != null)
+                        writer.setColor(finalJ, finalI, Color.rgb(clamp(finalColor.x), clamp(finalColor.y), clamp(finalColor.z)));
                 }
             }
         }
