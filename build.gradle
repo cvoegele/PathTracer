@@ -13,3 +13,13 @@ javafx {
 }
 
 mainClassName = 'ch.voegele.Main'
+
+jar {
+    manifest {
+        attributes "Main-Class": "ch.voegele.Main"
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
