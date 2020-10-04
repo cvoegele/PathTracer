@@ -12,7 +12,7 @@ All Arguments are optional. If left blank these Standard Values are taken:
 
     threads = 1
     sampleRate = 32 
-    bounces = 5
+    bounces = -1 means probability termination on bounces is used
 
 Sample Arguments
 

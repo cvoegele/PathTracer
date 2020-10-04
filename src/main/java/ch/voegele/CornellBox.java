@@ -96,7 +96,15 @@ public class CornellBox {
                         Vec3[] colors = new Vec3[sampleRate];
                         for (int i = 0; i < sampleRate; i++) {
                             Ray ray = renderer.CreateEyeRay(eye, lookAt, FOV, new Vec2(x, y));
-                            Vec3 color = renderer.ComputeColor(scene, ray, bounces, 0);
+
+                            Vec3 color;
+                            if (bounces != -1)
+                                //call with limited bounces
+                                color = renderer.ComputeColor(scene, ray, bounces, 0);
+                            else
+                                //call with probability termination of bounces
+                                color = renderer.ComputeColor(scene, ray);
+
                             colors[i] = color;
                         }
                         Vec3 sum = new Vec3(0, 0, 0);

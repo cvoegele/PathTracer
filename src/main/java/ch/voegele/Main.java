@@ -21,14 +21,14 @@ public class Main extends Application {
      * All Arguments are optional. If left blank these Standard Values are taken
      * threads = 1
      * sampleRate = 32
-     * bounces = 5
+     * bounces = -1 means probability termination on bounces is used
      *
      * @param args command line arguments
      */
     public static void main(String[] args) {
         var numberOfThreads = 1;
         var sampleRate = 32;
-        var bounces = 5;
+        var bounces = -1;
 
         //read arguments
         if (args.length > 0) {
