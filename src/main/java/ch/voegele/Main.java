@@ -42,7 +42,7 @@ public class Main extends Application {
 
             Pair<String, String>[] arguments = new Pair[splits.length / 2];
             for (int i = 0; i < splits.length / 2; i++) {
-                var arg = new Pair<String, String>(splits[i], splits[i + 1]);
+                var arg = new Pair<String, String>(splits[i * 2], splits[i * 2 + 1]);
                 arguments[i] = arg;
             }
 
@@ -80,7 +80,7 @@ public class Main extends Application {
 
     private static int readBounces(Pair<String, String>[] arguments) {
         for (Pair<String, String> argument : arguments) {
-            if ("-sampleRate".equals(argument.getKey()))
+            if ("-bounces".equals(argument.getKey()))
                 return Integer.parseInt(argument.getValue());
         }
         return -1;
