@@ -176,8 +176,6 @@ public class MyRenderer {
         }
 
         double p = 0.1;
-//        if (random.nextDouble() < p) {
-//            return point.getEmission();
         if (bounces == bounce) {
             return point.getEmission();
         } else {
@@ -206,8 +204,8 @@ public class MyRenderer {
 
 
     Vec3 BRDF(HitPoint point, Ray r, Vec3 w) {
-        var epsilon = 0.1;
-        var mu = 5;
+        var epsilon = 0.5;
+        var mu = 1.5f;
 
         var normal = point.getNormal().normalize();
         var d = r.getDirection();
