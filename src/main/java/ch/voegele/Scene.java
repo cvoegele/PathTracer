@@ -2,13 +2,13 @@ package ch.voegele;
 
 public class Scene {
 
-    private SceneElement[] objects;
+    private ISceneElement[] objects;
 
-    public Scene(SceneElement[] objects) {
+    public Scene(ISceneElement[] objects) {
         this.objects = objects;
     }
 
-    public SceneElement[] getObjects() {
+    public ISceneElement[] getObjects() {
         return objects;
     }
 }

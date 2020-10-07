@@ -1,11 +1,10 @@
 package ch.voegele;
 
+import ch.voegele.Texture.SpherePlanarTextureMapping;
+import ch.voegele.util.MathUtilities;
 import ch.voegele.util.Vec2;
 import ch.voegele.util.Vec3;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.collections.ObservableArray;
-import javafx.collections.ObservableArrayBase;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -13,9 +12,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.Timer;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.TimerTask;
 
 public class CornellBox {
@@ -46,29 +47,33 @@ public class CornellBox {
 
     public javafx.scene.Scene startRender() throws InterruptedException {
         startTime = System.currentTimeMillis();
-        initScene();
+
+        try {
+            initScene();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         var view = RenderCornellBox(sampleRate, numberOfThreads);
-
-        Timer timer = new Timer();
-        timer.schedule(new UpdateWindow(), 1000, 2000);
-
+        saveRenderAsImage();
         return new javafx.scene.Scene(new VBox(view), width, height);
     }
 
 
-    private void initScene() {
+    private void initScene() throws IOException {
         Sphere left = new Sphere(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), new Vec3(0, 0, 0), Vec3.ZERO);
         Sphere right = new Sphere(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
         Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
         Sphere bot = new Sphere(new Vec3(0, 1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
-        Sphere top = new Sphere(new Vec3(0, -1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(1, 1, 1).scale(5), Vec3.ZERO);
-        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.42, 0.42, 0), new Vec3(0, 0, 0), new Vec3(0.1, 0.1, 0.1));
+        Sphere top = new Sphere(new Vec3(0, -1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(1, 1, 1).scale(0.1f), Vec3.ZERO);
+        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), new Vec3(0.1, 0.1, 0.1));
 //        CornellBox.Sphere yellowBall2 = new CornellBox.Sphere(new Vec3(-0.6, 0.7, 0.5), 0.3f, new Vec3(0, 0.9, 0.9));
-        Sphere lightBlueBall = new Sphere(new Vec3(0.3, 0.4, 0.3), 0.6f, new Vec3(0.4, 0.4, 0.4), new Vec3(0, 0, 0), new Vec3(0.1, 0.1, 0.1));
+        Sphere lightBlueBall = new Sphere(new Vec3(0.3, 0.4, 0.3), 0.6f, new Vec3(0.4, 0.4, 0.4), new Vec3(1, 1, 1).scale(0), Vec3.ZERO);
+        SpherePlanarTextureMapping textureMapping = new SpherePlanarTextureMapping("cow.jpg");
+        lightBlueBall.setTextureMapper(textureMapping);
 //        CornellBox.Sphere lightBlueBall = new CornellBox.Sphere(new Vec3(0, 0, 0.3), 0.6f, new Vec3(0, 0.7, 0.7),new Vec3(0,0,0));
 
-        scene = new Scene(new SceneElement[]{left, right, back, bot, top, yellowBall, lightBlueBall});
+        scene = new Scene(new ISceneElement[]{left, right, back, bot, top, yellowBall, lightBlueBall});
 //        scene = new CornellBox.Scene(new CornellBox.SceneElement[]{ lightBlueBall});
     }
 
@@ -115,11 +120,14 @@ public class CornellBox {
                         var red = sum.x / (double) sampleRate;
                         var blue = sum.z / (double) sampleRate;
                         var green = sum.y / (double) sampleRate;
-//                red = Math.pow(red, 1 / 22d);
-//                blue = Math.pow(blue, 1 / 22d);
-//                green = Math.pow(green, 1 / 22d);
+
+                        red = Math.pow(red, 1 / 2.2d);
+                        blue = Math.pow(blue, 1 / 2.2d);
+                        green = Math.pow(green, 1 / 2.2d);
+
                         Vec3 finalColor = new Vec3(red * 255, green * 255, blue * 255);
                         imageArray[u][v] = finalColor;
+                        writer.setColor(u, v, finalColor.toColor());
                     }
                 }
 
@@ -129,30 +137,31 @@ public class CornellBox {
             threads[partIndex].start();
         }
 
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+
         ImageView view = new ImageView();
         view.setImage(image);
         return view;
     }
 
-    private class UpdateWindow extends TimerTask {
-        @Override
-        public void run() {
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
-                    int finalJ = j;
-                    int finalI = i;
-                    var finalColor = imageArray[finalJ][finalI];
-                    if (finalColor != null)
-                        writer.setColor(finalJ, finalI, Color.rgb(clamp(finalColor.x), clamp(finalColor.y), clamp(finalColor.z)));
-                }
+
+    private void saveRenderAsImage() {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                var finalColor = imageArray[j][i];
+                if (finalColor != null)
+                    image.setRGB(j, i, finalColor.toRGB());
             }
         }
-    }
-
-
-    private int clamp(float a) {
-        if (a > 255) return 255;
-        return (int) Math.max(a, 0);
+        try {
+            ImageIO.write(image, "bmp", new FileOutputStream("output/render_H" + LocalDateTime.now().getHour() + "_M" + LocalDateTime.now().getMinute() + ".bmp"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

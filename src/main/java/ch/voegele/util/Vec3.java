@@ -29,6 +29,8 @@ package ch.voegele.util;/*
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import javafx.scene.paint.Color;
+
 import java.util.Collection;
 
 /**
@@ -174,5 +176,18 @@ public final class Vec3 {
             result[i++] = v.z;
         }
         return result;
+    }
+
+    public int toRGB() {
+        int red = (MathUtilities.clamp((int) x, 0, 255) << 16);
+        int green = (MathUtilities.clamp((int) y, 0, 255) << 8);
+        int blue = (MathUtilities.clamp((int) z, 0, 255));
+        return red | green | blue;
+    }
+
+    public Color toColor(){
+        return Color.rgb(MathUtilities.clamp((int) x, 0, 255),
+                MathUtilities.clamp((int) y, 0, 255),
+                 MathUtilities.clamp((int) z, 0, 255));
     }
 }

@@ -5,13 +5,13 @@ import ch.voegele.util.Vec3;
 public class HitPoint {
 
     private final Vec3 position;
-    private final SceneElement hitObject;
+    private final ISceneElement hitObject;
     private final double lambda;
     private final Vec3 emission;
     private final Ray ray;
 
 
-    public HitPoint(Vec3 position, SceneElement hitObject, double lambda, Vec3 emission, Ray ray) {
+    public HitPoint(Vec3 position, ISceneElement hitObject, double lambda, Vec3 emission, Ray ray) {
         this.position = position;
         this.hitObject = hitObject;
         this.lambda = lambda;
@@ -23,7 +23,7 @@ public class HitPoint {
         return position;
     }
 
-    public SceneElement getHitObject() {
+    public ISceneElement getHitObject() {
         return hitObject;
     }
 

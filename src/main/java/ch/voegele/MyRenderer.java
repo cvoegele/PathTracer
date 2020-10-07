@@ -56,11 +56,11 @@ public class MyRenderer {
     HitPoint FindClosestHitPoint(Scene s, Ray r) {
         //standard values meaning no hitpoint, will only be overwritten when there is a hitpoint
         Vec3 closestPoint = Vec3.ZERO;
-        SceneElement hitObject = null;
+        ISceneElement hitObject = null;
         double lambda = 0d;
         Vec3 emission = Vec3.ZERO;
 
-        for (SceneElement element : s.getObjects()) {
+        for (ISceneElement element : s.getObjects()) {
             if (element instanceof Sphere) {
                 Sphere sphere = (Sphere) element;
 
@@ -212,9 +212,9 @@ public class MyRenderer {
         var reflection = d.subtract(normal.scale(normal.dot(d)).scale(2));
         var wDotD = w.dot(reflection);
         if (wDotD > 1 - epsilon) {
-            return point.getHitObject().getColor().add(point.getHitObject().getSpecularColor().scale(mu));
+            return point.getHitObject().getColor(point.getNormal()).add(point.getHitObject().getSpecularColor().scale(mu));
         } else {
-            return point.getHitObject().getColor();
+            return point.getHitObject().getColor(point.getNormal());
         }
     }
 
