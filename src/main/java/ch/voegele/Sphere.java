@@ -2,6 +2,9 @@ package ch.voegele;
 
 import ch.voegele.Texture.ITextureMapper;
 import ch.voegele.util.Vec3;
+import ch.voegele.util.VectorHelpers;
+
+import java.util.Vector;
 
 public class Sphere implements ISceneElement {
 
@@ -11,6 +14,7 @@ public class Sphere implements ISceneElement {
     private final Vec3 Emission;
     private final Vec3 specularColor;
     private ITextureMapper textureMapper;
+    private VectorHelpers helper = new VectorHelpers(2.2);
 
     public Sphere(Vec3 position, float radius, Vec3 color, Vec3 Emission, Vec3 specularColor) {
         this.position = position;
@@ -47,13 +51,16 @@ public class Sphere implements ISceneElement {
         int green = (value & 0xFF00) >> 8;
         int blue = (value & 0xFF);
 
-        double redf = Math.pow(red, 2.2) / 255f;
-        double greenf = Math.pow(green, 2.2) / 255f;
-        double bluef = Math.pow(blue, 2.2) / 255f;
+        var sRGB = new Vec3(red, green, blue);
+        var RGB = helper.sRGBtoRGB(sRGB);
+
+//        double redf = Math.pow(red / 255f, 2.2);
+//        double greenf = Math.pow(green / 255f, 2.2);
+//        double bluef = Math.pow(blue / 255f, 2.2);
 
         var dimmingConstant = 0.1f;
 
-        return new Vec3(redf * dimmingConstant, greenf * dimmingConstant, bluef * dimmingConstant);
+        return RGB;
     }
 
     public Vec3 getEmission() {
