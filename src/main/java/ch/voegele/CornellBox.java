@@ -22,8 +22,8 @@ import java.util.TimerTask;
 
 public class CornellBox {
 
-    private int width = 480;
-    private int height = 480;
+    private int width = 1024;
+    private int height = 1024;
 
     Vec3 eye = new Vec3(0, 0, -4);
     Vec3 lookAt = new Vec3(0, 0, 6);
