@@ -210,8 +210,8 @@ public class MyRenderer {
         var normal = point.getNormal().normalize();
         var d = r.getDirection();
         var reflection = d.subtract(normal.scale(normal.dot(d)).scale(2));
-        var wDotD = w.dot(reflection);
-        if (wDotD > 1 - epsilon) {
+        var wDotReflection = w.dot(reflection);
+        if (wDotReflection > 1 - epsilon) {
             return point.getHitObject().getColor(point.getNormal()).add(point.getHitObject().getSpecularColor().scale(mu));
         } else {
             return point.getHitObject().getColor(point.getNormal());
