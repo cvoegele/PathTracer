@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Timer;
 import java.util.TimerTask;
 
 public class CornellBox {
@@ -37,6 +38,7 @@ public class CornellBox {
     Scene scene;
     private Thread[] threads;
     private long startTime;
+    WritableImage image;
 
 
     public CornellBox(int numberOfThreads, int sampleRate, int bounces) {
@@ -54,8 +56,22 @@ public class CornellBox {
             e.printStackTrace();
         }
 
-        var view = RenderCornellBox(sampleRate, numberOfThreads);
-        saveRenderAsImage();
+        image = new WritableImage(width, height);
+        imageArray = new Vec3[width][height];
+        ImageView view = new ImageView(image);
+
+        new Thread(() -> {
+            try {
+                RenderCornellBox(sampleRate, numberOfThreads);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            saveRenderAsImage();
+        }).start();
+
+        Timer timer = new Timer();
+        timer.schedule(new UpdateWindow(), 1000, 2000);
+
         return new javafx.scene.Scene(new VBox(view), width, height);
     }
 
@@ -65,10 +81,10 @@ public class CornellBox {
         Sphere right = new Sphere(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
         Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
         Sphere bot = new Sphere(new Vec3(0, 1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
-        Sphere top = new Sphere(new Vec3(0, -1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(1, 1, 1).scale(5f), Vec3.ZERO);
-        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.42, 0.42, 0), new Vec3(0, 0, 0), new Vec3(0.1, 0.1, 0.1));
+        Sphere top = new Sphere(new Vec3(0, -1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(1, 1, 1).scale(4f), Vec3.ZERO);
+        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.42, 0.42, 0), new Vec3(0, 0, 0), Vec3.ONE);
 //        CornellBox.Sphere yellowBall2 = new CornellBox.Sphere(new Vec3(-0.6, 0.7, 0.5), 0.3f, new Vec3(0, 0.9, 0.9));
-        Sphere lightBlueBall = new Sphere(new Vec3(0.3, 0.4, 0.3), 0.6f, Vec3.ZERO, Vec3.ZERO, new Vec3(0.1, 0.1, 0.1));
+        Sphere lightBlueBall = new Sphere(new Vec3(0.3, 0.4, 0.3), 0.6f, Vec3.ZERO, Vec3.ZERO, Vec3.ONE);
         SpherePlanarTextureMapping textureMapping = new SpherePlanarTextureMapping("fire.jpg");
         lightBlueBall.setTextureMapper(textureMapping);
 //        CornellBox.Sphere lightBlueBall = new CornellBox.Sphere(new Vec3(0, 0, 0.3), 0.6f, new Vec3(0, 0.7, 0.7),new Vec3(0,0,0));
@@ -77,8 +93,8 @@ public class CornellBox {
 //        scene = new CornellBox.Scene(new CornellBox.SceneElement[]{ lightBlueBall});
     }
 
-    private ImageView RenderCornellBox(int sampleRate, int numberOfThreads) throws InterruptedException {
-        WritableImage image = new WritableImage(width, height);
+    private void RenderCornellBox(int sampleRate, int numberOfThreads) throws InterruptedException {
+        //WritableImage image = new WritableImage(width, height);
         writer = image.getPixelWriter();
 
         MyRenderer renderer = new MyRenderer(eye, lookAt, FOV);
@@ -127,7 +143,7 @@ public class CornellBox {
 
                         Vec3 finalColor = new Vec3(red * 255, green * 255, blue * 255);
                         imageArray[u][v] = finalColor;
-                        writer.setColor(u, v, finalColor.toColor());
+                        //writer.setColor(u, v, finalColor.toColor());
                     }
                 }
 
@@ -140,11 +156,19 @@ public class CornellBox {
         for (Thread thread : threads) {
             thread.join();
         }
+    }
 
-
-        ImageView view = new ImageView();
-        view.setImage(image);
-        return view;
+    private class UpdateWindow extends TimerTask {
+        @Override
+        public void run() {
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    var finalColor = imageArray[j][i];
+                    if (finalColor != null)
+                        writer.setColor(j, i, finalColor.toColor());
+                }
+            }
+        }
     }
 
 

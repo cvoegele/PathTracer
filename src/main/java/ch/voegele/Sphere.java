@@ -4,8 +4,6 @@ import ch.voegele.Texture.ITextureMapper;
 import ch.voegele.util.Vec3;
 import ch.voegele.util.VectorHelpers;
 
-import java.util.Vector;
-
 public class Sphere implements ISceneElement {
 
     private final Vec3 position;
@@ -53,12 +51,6 @@ public class Sphere implements ISceneElement {
 
         var sRGB = new Vec3(red, green, blue);
         var RGB = helper.sRGBtoRGB(sRGB);
-
-//        double redf = Math.pow(red / 255f, 2.2);
-//        double greenf = Math.pow(green / 255f, 2.2);
-//        double bluef = Math.pow(blue / 255f, 2.2);
-
-        var dimmingConstant = 0.1f;
 
         return RGB;
     }
