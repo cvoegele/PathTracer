@@ -25,8 +25,8 @@ public class CornellBox {
     private int width = 1024;
     private int height = 1024;
 
-    Vec3 eye = new Vec3(0, 0, -4);
-    Vec3 lookAt = new Vec3(0, 0, 6);
+    Vec3 eye = new Vec3(0, -2, -5);
+    Vec3 lookAt = new Vec3(0, 0, 3);
     double FOV = 36;
     int numberOfThreads;
     int sampleRate;
@@ -76,21 +76,42 @@ public class CornellBox {
     }
 
 
-    private void initScene() throws IOException {
-        Sphere left = new Sphere(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), new Vec3(0, 0, 0), Vec3.ZERO);
-        Sphere right = new Sphere(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
-        Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
-        Sphere bot = new Sphere(new Vec3(0, 1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
-        Sphere top = new Sphere(new Vec3(0, -1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(1, 1, 1).scale(4f), Vec3.ZERO);
-        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.42, 0.42, 0), new Vec3(0, 0, 0), Vec3.ONE);
-//        CornellBox.Sphere yellowBall2 = new CornellBox.Sphere(new Vec3(-0.6, 0.7, 0.5), 0.3f, new Vec3(0, 0.9, 0.9));
-        Sphere lightBlueBall = new Sphere(new Vec3(0.3, 0.4, 0.3), 0.6f, Vec3.ZERO, Vec3.ZERO, Vec3.ONE);
-        SpherePlanarTextureMapping textureMapping = new SpherePlanarTextureMapping("fire.jpg");
-        lightBlueBall.setTextureMapper(textureMapping);
-//        CornellBox.Sphere lightBlueBall = new CornellBox.Sphere(new Vec3(0, 0, 0.3), 0.6f, new Vec3(0, 0.7, 0.7),new Vec3(0,0,0));
+//    private void initScene() throws IOException {
+//        Sphere left = new Sphere(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), new Vec3(0, 0, 0), Vec3.ZERO);
+//        Sphere right = new Sphere(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
+//        Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
+//        Sphere bot = new Sphere(new Vec3(0, 1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
+//        Sphere top = new Sphere(new Vec3(0, -1001, 0), 1000, new Vec3(0.3, 0.3, 0.3), new Vec3(1, 1, 1).scale(4f), Vec3.ZERO);
+//        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.42, 0.42, 0), new Vec3(0, 0, 0), Vec3.ONE);
+////        CornellBox.Sphere yellowBall2 = new CornellBox.Sphere(new Vec3(-0.6, 0.7, 0.5), 0.3f, new Vec3(0, 0.9, 0.9));
+//        Sphere lightBlueBall = new Sphere(new Vec3(0.3, 0.4, 0.3), 0.6f, Vec3.ZERO, Vec3.ZERO, Vec3.ONE);
+//        SpherePlanarTextureMapping textureMapping = new SpherePlanarTextureMapping("cow.jpg");
+//        lightBlueBall.setTextureMapper(textureMapping);
+////        CornellBox.Sphere lightBlueBall = new CornellBox.Sphere(new Vec3(0, 0, 0.3), 0.6f, new Vec3(0, 0.7, 0.7),new Vec3(0,0,0));
+//
+//        scene = new Scene(new ISceneElement[]{left, right, back, bot, top, yellowBall, lightBlueBall});
+////        scene = new CornellBox.Scene(new CornellBox.SceneElement[]{ lightBlueBall});
+//    }
 
-        scene = new Scene(new ISceneElement[]{left, right, back, bot, top, yellowBall, lightBlueBall});
-//        scene = new CornellBox.Scene(new CornellBox.SceneElement[]{ lightBlueBall});
+    private void initScene() throws IOException {
+        //Sphere left = new Sphere(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), new Vec3(0, 0, 0), Vec3.ZERO);
+        //Sphere right = new Sphere(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
+        //Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
+        Sphere ground = new Sphere(new Vec3(0, 1001, 0), 1000, Vec3.ZERO ,Vec3.ZERO, Vec3.ONE);
+        SpherePlanarTextureMapping textureMapping = new SpherePlanarTextureMapping("fire.jpg");
+
+        Sphere skydome = new Sphere(new Vec3(0, 0, 0), 1000, Vec3.ZERO,  new Vec3(0.5, 0.5,0.5), Vec3.ZERO);
+        skydome.setTextureMapper(textureMapping);
+
+        var reflector = new Sphere(new Vec3(0,0,0),1, Vec3.ZERO, Vec3.ZERO, Vec3.ONE);
+
+//        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.7, 0.7, 0), new Vec3(0.42, 0.42, 0), Vec3.ONE);
+//        Sphere fireBall = new Sphere(new Vec3(0, 0.4, 0), 0.6f, Vec3.ZERO, new Vec3(0.2,0,0), Vec3.ONE);
+//        Sphere lightBall = new Sphere(new Vec3(0,100,700), 1f, Vec3.ONE, Vec3.ONE.scale(10), Vec3.ZERO);
+//        SpherePlanarTextureMapping earthTexture = new SpherePlanarTextureMapping("earth.tif");
+//        fireBall.setTextureMapper(earthTexture);
+
+        scene = new Scene(new ISceneElement[]{ground, skydome, reflector});
     }
 
     private void RenderCornellBox(int sampleRate, int numberOfThreads) throws InterruptedException {
