@@ -205,7 +205,7 @@ public class MyRenderer {
 
     Vec3 BRDF(HitPoint point, Ray r, Vec3 w) {
         var epsilon = 0.05f;
-        var mu = 3f;
+        var mu = 2f;
 
         var normal = point.getNormal().normalize();
         var d = r.getDirection();

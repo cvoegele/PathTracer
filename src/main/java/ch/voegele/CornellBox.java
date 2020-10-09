@@ -23,11 +23,11 @@ import java.util.TimerTask;
 
 public class CornellBox {
 
-    private int width = 1024;
-    private int height = 1024;
+    private int width = 500;
+    private int height = 500;
 
-    Vec3 eye = new Vec3(4.5, -2, -4.5);
-    Vec3 lookAt = new Vec3(-1.5, 0, 1.5);
+    Vec3 eye = new Vec3(0, -3, -3);
+    Vec3 lookAt = new Vec3(0, 0, 0);
     double FOV = 36;
     int numberOfThreads;
     int sampleRate;
@@ -100,13 +100,15 @@ public class CornellBox {
         //Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
         Sphere ground = new Sphere(new Vec3(0, 1001, 0), 1000, Vec3.ZERO ,Vec3.ZERO, Vec3.ONE);
 
-        var textureMapping = new SphereSphericalTextureMapping("sky.jpg");
-        Sphere skydome = new Sphere(new Vec3(0, 0, 0), 1000, Vec3.ZERO,  new Vec3(0.5, 0.5,0.5), Vec3.ZERO);
+        var textureMapping = new SphereSphericalTextureMapping("small_cathedral_02.jpg");
+        Sphere skydome = new Sphere(new Vec3(0, 0, 0), 1000, Vec3.ZERO,  new Vec3(0.01, 0.01,0.01), Vec3.ZERO);
         skydome.setTextureMapper(textureMapping);
 
         var reflector = new Sphere(new Vec3(0,0,0),1, Vec3.ZERO, Vec3.ZERO, Vec3.ONE);
-        var earthTexture = new SphereSphericalTextureMapping("earth.tif");
-        reflector.setTextureMapper(earthTexture);
+//        var reflector2 = new Sphere(new Vec3(1,-1,1),0.5f, new Vec3(0.1,0.1,0.1), Vec3.ZERO, Vec3.ONE);
+//        var reflector3 = new Sphere(new Vec3(-1,0.5,-1),0.5f, new Vec3(0.7,0.7,0.7), Vec3.ZERO, Vec3.ONE);
+//        var earthTexture = new SphereSphericalTextureMapping("earth.tif");
+//        reflector.setTextureMapper(earthTexture);
 
 //        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.7, 0.7, 0), new Vec3(0.42, 0.42, 0), Vec3.ONE);
 //        Sphere fireBall = new Sphere(new Vec3(0, 0.4, 0), 0.6f, Vec3.ZERO, new Vec3(0.2,0,0), Vec3.ONE);
