@@ -1,6 +1,7 @@
 package ch.voegele;
 
 import ch.voegele.Texture.SpherePlanarTextureMapping;
+import ch.voegele.Texture.SphereSphericalTextureMapping;
 import ch.voegele.util.MathUtilities;
 import ch.voegele.util.Vec2;
 import ch.voegele.util.Vec3;
@@ -25,7 +26,7 @@ public class CornellBox {
     private int width = 1024;
     private int height = 1024;
 
-    Vec3 eye = new Vec3(0, -2, -5);
+    Vec3 eye = new Vec3(0, -2, -7);
     Vec3 lookAt = new Vec3(0, 0, 3);
     double FOV = 36;
     int numberOfThreads;
@@ -98,8 +99,8 @@ public class CornellBox {
         //Sphere right = new Sphere(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
         //Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
         Sphere ground = new Sphere(new Vec3(0, 1001, 0), 1000, Vec3.ZERO ,Vec3.ZERO, Vec3.ONE);
-        SpherePlanarTextureMapping textureMapping = new SpherePlanarTextureMapping("fire.jpg");
 
+        var textureMapping = new SphereSphericalTextureMapping("sky.jpg");
         Sphere skydome = new Sphere(new Vec3(0, 0, 0), 1000, Vec3.ZERO,  new Vec3(0.5, 0.5,0.5), Vec3.ZERO);
         skydome.setTextureMapper(textureMapping);
 
