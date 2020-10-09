@@ -16,8 +16,9 @@ public class SphereSphericalTextureMapping extends AbstractBitmapTexture impleme
     public int getColorByNormal(Vec3 normal) {
         normal = normal.normalize();
 
-        double s = Math.atan2(normal.x, normal.z) / Math.PI + 1; //-PI up to PI
-        double t = Math.acos(normal.y) / Math.PI; //0 up to PI
+        //map outputs of functions atan2 and acos to 0 to 1
+        double s = (Math.atan2(normal.x, -normal.z) + Math.PI) / (2*Math.PI);
+        double t = (Math.acos(-normal.y)) / Math.PI; //account for upside down coordinate system on y-axis
 
         s = MathUtilities.clamp(s, 0, 1);
         t = MathUtilities.clamp(t, 0, 1);

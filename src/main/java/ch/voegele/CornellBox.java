@@ -26,8 +26,8 @@ public class CornellBox {
     private int width = 1024;
     private int height = 1024;
 
-    Vec3 eye = new Vec3(0, -2, -7);
-    Vec3 lookAt = new Vec3(0, 0, 3);
+    Vec3 eye = new Vec3(4.5, -2, -4.5);
+    Vec3 lookAt = new Vec3(-1.5, 0, 1.5);
     double FOV = 36;
     int numberOfThreads;
     int sampleRate;
@@ -105,6 +105,8 @@ public class CornellBox {
         skydome.setTextureMapper(textureMapping);
 
         var reflector = new Sphere(new Vec3(0,0,0),1, Vec3.ZERO, Vec3.ZERO, Vec3.ONE);
+        var earthTexture = new SphereSphericalTextureMapping("earth.tif");
+        reflector.setTextureMapper(earthTexture);
 
 //        Sphere yellowBall = new Sphere(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.7, 0.7, 0), new Vec3(0.42, 0.42, 0), Vec3.ONE);
 //        Sphere fireBall = new Sphere(new Vec3(0, 0.4, 0), 0.6f, Vec3.ZERO, new Vec3(0.2,0,0), Vec3.ONE);
