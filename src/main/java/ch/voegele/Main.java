@@ -54,7 +54,8 @@ public class Main extends Application {
         //create Render
         toRender = new SceneRenderer(500,500, numberOfThreads, sampleRate, bounces);
         //set scene to render
-        toRender.setScene(setupSkyBoxScene());
+        //toRender.setScene(setupSkyBoxScene());
+        toRender.setScene(setupCornellBox());
         launch(args);
     }
 

@@ -55,6 +55,7 @@ public class SceneRenderer {
         imageArray = new Vec3[width][height];
         ImageView view = new ImageView(image);
 
+        Timer timer = new Timer();
         new Thread(() -> {
             try {
                 renderScene();
@@ -62,9 +63,10 @@ public class SceneRenderer {
                 e.printStackTrace();
             }
             saveRenderAsImage();
+            timer.cancel(); // cancel timer
+            new UpdateWindow().run(); //update one last time
         }).start();
 
-        Timer timer = new Timer();
         timer.schedule(new UpdateWindow(), 1000, 2000);
 
         return new javafx.scene.Scene(new VBox(view), width, height);
@@ -147,7 +149,6 @@ public class SceneRenderer {
             }
         }
     }
-
 
     private void saveRenderAsImage() {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
