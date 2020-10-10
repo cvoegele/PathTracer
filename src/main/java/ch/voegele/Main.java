@@ -1,16 +1,16 @@
 package ch.voegele;
 
+import ch.voegele.Texture.SphereSphericalTextureMapping;
+import ch.voegele.util.Vec3;
 import javafx.application.Application;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
-import java.util.Timer;
+import java.io.IOException;
 
 public class Main extends Application {
 
-    private static CornellBox box;
+    private static SceneRenderer toRender;
 
     /***
      * Possible Commandline Arguments:
@@ -51,13 +51,36 @@ public class Main extends Application {
             bounces = readBounces(arguments);
         }
 
-        //create RenderBox
-        box = new CornellBox(numberOfThreads, sampleRate, bounces);
+        //create Render
+        toRender = new SceneRenderer(500,500, numberOfThreads, sampleRate, bounces);
+        //set scene to render
+        toRender.setScene(setupCornellBox());
         launch(args);
     }
 
+    private static Scene setupCornellBox() {
+        var scene = new Scene(new Vec3(0,0,-4), new Vec3(0,0,6), 36);
+        scene.addSphereShiny(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), Vec3.ONE);
+        scene.addSphereShiny(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), Vec3.ONE);
+        scene.addSphereShiny(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), Vec3.ONE);
+        scene.addSphereShiny(new Vec3(0, 1001, 0), 1000, new Vec3(0.1, 0.1, 0.1), Vec3.ONE);
+        scene.addSphereEmmissive(new Vec3(0, -1001, 0), 1000, new Vec3(0.8, 0.8, 0.8), Vec3.ONE.scale(4f));
+
+        scene.addSphereShiny(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.42, 0.42, 0), Vec3.ONE);
+        try {
+            var fireTexure = new SphereSphericalTextureMapping("earth.tif");
+            scene.addSphereTextureShiny(new Vec3(0.3, 0.3, -0.3), 0.6f, fireTexure, Vec3.ONE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return scene;
+    }
+
+
+
+
     public void start(Stage primaryStage) throws InterruptedException {
-        var scene = box.startRender();
+        var scene = toRender.startRender();
         primaryStage.setScene(scene);
         primaryStage.show();
     }

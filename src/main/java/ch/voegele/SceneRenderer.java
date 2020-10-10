@@ -1,17 +1,12 @@
 package ch.voegele;
 
-import ch.voegele.Texture.SpherePlanarTextureMapping;
 import ch.voegele.Texture.SphereSphericalTextureMapping;
-import ch.voegele.util.MathUtilities;
 import ch.voegele.util.Vec2;
 import ch.voegele.util.Vec3;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -21,14 +16,11 @@ import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class CornellBox {
+public class SceneRenderer {
 
-    private int width = 500;
-    private int height = 500;
+    private int width;
+    private int height;
 
-    Vec3 eye = new Vec3(0, -3, -3);
-    Vec3 lookAt = new Vec3(0, 0, 0);
-    double FOV = 36;
     int numberOfThreads;
     int sampleRate;
     int bounces;
@@ -42,20 +34,22 @@ public class CornellBox {
     WritableImage image;
 
 
-    public CornellBox(int numberOfThreads, int sampleRate, int bounces) {
+    public SceneRenderer(int width , int height ,int numberOfThreads, int sampleRate, int bounces) {
+        this.width = width;
+        this.height = height;
         this.numberOfThreads = numberOfThreads;
         this.sampleRate = sampleRate;
         this.bounces = bounces;
     }
 
-    public javafx.scene.Scene startRender() throws InterruptedException {
-        startTime = System.currentTimeMillis();
+    public void setScene(Scene scene){
+        this.scene = scene;
+    }
 
-        try {
-            initScene();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public javafx.scene.Scene startRender() {
+        if (scene == null) throw new NullPointerException("Scene was not set!");
+
+        startTime = System.currentTimeMillis();
 
         image = new WritableImage(width, height);
         imageArray = new Vec3[width][height];
@@ -63,7 +57,7 @@ public class CornellBox {
 
         new Thread(() -> {
             try {
-                RenderCornellBox(sampleRate, numberOfThreads);
+                renderScene();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -98,13 +92,13 @@ public class CornellBox {
         //Sphere left = new Sphere(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), new Vec3(0, 0, 0), Vec3.ZERO);
         //Sphere right = new Sphere(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), new Vec3(0, 0, 0), Vec3.ZERO);
         //Sphere back = new Sphere(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), new Vec3(0, 0, 0), Vec3.ZERO);
-        Sphere ground = new Sphere(new Vec3(0, 1001, 0), 1000, Vec3.ZERO ,Vec3.ZERO, Vec3.ONE);
+        Sphere ground = new Sphere(new Vec3(0, 1001, 0), 1000, Vec3.ZERO, Vec3.ZERO, Vec3.ONE);
 
         var textureMapping = new SphereSphericalTextureMapping("small_cathedral_02.jpg");
-        Sphere skydome = new Sphere(new Vec3(0, 0, 0), 1000, Vec3.ZERO,  new Vec3(0.01, 0.01,0.01), Vec3.ZERO);
+        Sphere skydome = new Sphere(new Vec3(0, 0, 0), 1000, Vec3.ZERO, new Vec3(0.01, 0.01, 0.01), Vec3.ZERO);
         skydome.setTextureMapper(textureMapping);
 
-        var reflector = new Sphere(new Vec3(0,0,0),1, Vec3.ZERO, Vec3.ZERO, Vec3.ONE);
+        var reflector = new Sphere(new Vec3(0, 0, 0), 1, Vec3.ZERO, Vec3.ZERO, Vec3.ONE);
 //        var reflector2 = new Sphere(new Vec3(1,-1,1),0.5f, new Vec3(0.1,0.1,0.1), Vec3.ZERO, Vec3.ONE);
 //        var reflector3 = new Sphere(new Vec3(-1,0.5,-1),0.5f, new Vec3(0.7,0.7,0.7), Vec3.ZERO, Vec3.ONE);
 //        var earthTexture = new SphereSphericalTextureMapping("earth.tif");
@@ -115,15 +109,13 @@ public class CornellBox {
 //        Sphere lightBall = new Sphere(new Vec3(0,100,700), 1f, Vec3.ONE, Vec3.ONE.scale(10), Vec3.ZERO);
 //        SpherePlanarTextureMapping earthTexture = new SpherePlanarTextureMapping("earth.tif");
 //        fireBall.setTextureMapper(earthTexture);
-
-        scene = new Scene(new ISceneElement[]{ground, skydome, reflector});
     }
 
-    private void RenderCornellBox(int sampleRate, int numberOfThreads) throws InterruptedException {
+    private void renderScene() throws InterruptedException {
         //WritableImage image = new WritableImage(width, height);
         writer = image.getPixelWriter();
 
-        MyRenderer renderer = new MyRenderer(eye, lookAt, FOV);
+        RenderEngine renderer = new RenderEngine(scene.getEye(), scene.getLookAt(), scene.getFOV());
         imageArray = new Vec3[height][width];
 
         //go through all pixels
@@ -142,7 +134,7 @@ public class CornellBox {
 
                         Vec3[] colors = new Vec3[sampleRate];
                         for (int i = 0; i < sampleRate; i++) {
-                            Ray ray = renderer.CreateEyeRay(eye, lookAt, FOV, new Vec2(x, y));
+                            Ray ray = renderer.CreateEyeRay(scene.getEye(), scene.getLookAt(), scene.getFOV(), new Vec2(x, y));
 
                             Vec3 color;
                             if (bounces != -1)

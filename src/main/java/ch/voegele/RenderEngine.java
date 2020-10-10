@@ -6,14 +6,14 @@ import ch.voegele.util.Vec3;
 import java.util.Random;
 
 
-public class MyRenderer {
+public class RenderEngine {
 
     private Vec3 eye;
     private Vec3 lookAt;
     private double FOV;
     private Random random;
 
-    public MyRenderer(Vec3 eye, Vec3 lookAt, double FOV) {
+    public RenderEngine(Vec3 eye, Vec3 lookAt, double FOV) {
         this.eye = eye;
         this.lookAt = lookAt;
         this.FOV = FOV;
@@ -60,7 +60,7 @@ public class MyRenderer {
         double lambda = 0d;
         Vec3 emission = Vec3.ZERO;
 
-        for (ISceneElement element : s.getObjects()) {
+        for (ISceneElement element : s.get()) {
             if (element instanceof Sphere) {
                 Sphere sphere = (Sphere) element;
 
