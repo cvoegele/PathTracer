@@ -54,7 +54,7 @@ public class Main extends Application {
         //create Render
         toRender = new SceneRenderer(500,500, numberOfThreads, sampleRate, bounces);
         //set scene to render
-        toRender.setScene(setupCornellBox());
+        toRender.setScene(setupSkyBoxScene());
         launch(args);
     }
 
@@ -76,7 +76,21 @@ public class Main extends Application {
         return scene;
     }
 
+    private static Scene setupSkyBoxScene(){
+        var scene = new Scene(new Vec3(0,-3,-3), new Vec3(0,0,0), 36);
+        scene.addSphereShiny(new Vec3(0,1001,0), 1000, Vec3.ZERO, Vec3.ONE); //ground
 
+        //add skybox
+        try {
+            var skyTexture = new SphereSphericalTextureMapping("small_cathedral_02.jpg");
+            scene.addSphereTextureEmissive(new Vec3(0,0,0), 1000, skyTexture, new Vec3(0.01,0.01,0.01));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        scene.addSphereShiny(new Vec3(0,0,0), 1, Vec3.ZERO, Vec3.ONE);
+        return scene;
+    }
 
 
     public void start(Stage primaryStage) throws InterruptedException {
@@ -108,6 +122,4 @@ public class Main extends Application {
         }
         return -1;
     }
-
-
 }
