@@ -1,7 +1,5 @@
 ##### Multithread Documentation
 
-This is branch is a multithreaded variant of the single core version of the version on the master branch
-
  Possible Commandline Arguments:
  
     ` -threads`     number of Threads the program should create to render the image
