@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,6 +25,7 @@ public class SceneRenderer {
     int numberOfThreads;
     int sampleRate;
     int bounces;
+    boolean gaussianAA;
 
     private PixelWriter writer;
     private Vec3[][] imageArray;
@@ -34,15 +36,16 @@ public class SceneRenderer {
     WritableImage image;
 
 
-    public SceneRenderer(int width , int height ,int numberOfThreads, int sampleRate, int bounces) {
+    public SceneRenderer(int width, int height, int numberOfThreads, int sampleRate, int bounces, boolean gaussianAA) {
         this.width = width;
         this.height = height;
         this.numberOfThreads = numberOfThreads;
         this.sampleRate = sampleRate;
         this.bounces = bounces;
+        this.gaussianAA = gaussianAA;
     }
 
-    public void setScene(Scene scene){
+    public void setScene(Scene scene) {
         this.scene = scene;
     }
 
@@ -73,7 +76,6 @@ public class SceneRenderer {
     }
 
     private void renderScene() throws InterruptedException {
-        //WritableImage image = new WritableImage(width, height);
         writer = image.getPixelWriter();
 
         RenderEngine renderer = new RenderEngine(scene.getEye(), scene.getLookAt(), scene.getFOV());
@@ -88,14 +90,30 @@ public class SceneRenderer {
 
             int finalPartIndex = partIndex;
             threads[partIndex] = new Thread(() -> {
+                //new random instance for every thread
+                Random r = new Random();
+
                 for (int v = start; v < end; v++) {
                     for (int u = 0; u < width; u++) {
                         double y = (((double) v / height) * 2) - 1;
                         double x = (((double) u / width) * 2) - 1;
 
+                        var sigmaX = 1d / width;
+                        var sigmaY = 1d / height;
+
                         Vec3[] colors = new Vec3[sampleRate];
                         for (int i = 0; i < sampleRate; i++) {
-                            Ray ray = renderer.CreateEyeRay(scene.getEye(), scene.getLookAt(), scene.getFOV(), new Vec2(x, y));
+
+                            double newX = x, newY = y;
+
+                            if (gaussianAA) {
+                                var xNudge = nextGaussianNormalDistribution(r, sigmaX);
+                                var yNudge = nextGaussianNormalDistribution(r, sigmaY);
+                                 newX += xNudge;
+                                 newY += yNudge;
+                            }
+
+                            Ray ray = renderer.CreateEyeRay(scene.getEye(), scene.getLookAt(), scene.getFOV(), new Vec2(newX, newY));
 
                             Vec3 color;
                             if (bounces != -1)
@@ -164,6 +182,11 @@ public class SceneRenderer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private double nextGaussianNormalDistribution(Random r, double sigma) {
+        var normalGaussian = r.nextGaussian();
+        return normalGaussian * sigma;
     }
 
 }

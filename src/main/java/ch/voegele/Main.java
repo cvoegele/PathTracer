@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 public class Main extends Application {
 
@@ -52,15 +53,17 @@ public class Main extends Application {
         }
 
         //create Render
-        toRender = new SceneRenderer(500,500, numberOfThreads, sampleRate, bounces);
+        toRender = new SceneRenderer(100, 100, numberOfThreads, sampleRate, bounces, false);
         //set scene to render
         //toRender.setScene(setupSkyBoxScene());
         toRender.setScene(setupCornellBox());
+        //toRender.setScene(setupGaussScene());
+
         launch(args);
     }
 
     private static Scene setupCornellBox() {
-        var scene = new Scene(new Vec3(0,0,-4), new Vec3(0,0,6), 36);
+        var scene = new Scene(new Vec3(0, 0, -4), new Vec3(0, 0, 6), 36);
         scene.addSphereShiny(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), Vec3.ONE);
         scene.addSphereShiny(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), Vec3.ONE);
         scene.addSphereShiny(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), Vec3.ONE);
@@ -77,19 +80,27 @@ public class Main extends Application {
         return scene;
     }
 
-    private static Scene setupSkyBoxScene(){
-        var scene = new Scene(new Vec3(0,-3,-3), new Vec3(0,0,0), 36);
-        scene.addSphereShiny(new Vec3(0,1001,0), 1000, Vec3.ZERO, Vec3.ONE); //ground
+    private static Scene setupSkyBoxScene() {
+        var scene = new Scene(new Vec3(0, -3, -3), new Vec3(0, 0, 0), 36);
+        scene.addSphereShiny(new Vec3(0, 1001, 0), 1000, Vec3.ZERO, Vec3.ONE); //ground
 
         //add skybox
         try {
             var skyTexture = new SphereSphericalTextureMapping("small_cathedral_02.jpg");
-            scene.addSphereTextureEmissive(new Vec3(0,0,0), 1000, skyTexture, new Vec3(0.01,0.01,0.01));
+            scene.addSphereTextureEmissive(new Vec3(0, 0, 0), 1000, skyTexture, new Vec3(0.01, 0.01, 0.01));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        scene.addSphereShiny(new Vec3(0,0,0), 1, Vec3.ZERO, Vec3.ONE);
+        scene.addSphereShiny(new Vec3(0, 0, 0), 1, Vec3.ZERO, Vec3.ONE);
+        return scene;
+    }
+
+    private static Scene setupGaussScene() {
+        var scene = new Scene(new Vec3(0, -3, -3), new Vec3(0, 0, 0), 36);
+        scene.addSphereDiffuse(new Vec3(0, 1001, 0), 1000, new Vec3(0.1,0.1,0.1)); //ground
+        scene.addSphereEmmissive(new Vec3(0,0,0), 1000, Vec3.ONE, new Vec3(0.01,0.01,0.01));
+        scene.addSphereDiffuse(new Vec3(0, 0, 0), 1, new Vec3(0,0,0.3));
         return scene;
     }
 

@@ -204,7 +204,7 @@ public class RenderEngine {
 
 
     Vec3 BRDF(HitPoint point, Ray r, Vec3 w) {
-        var epsilon = 0.05f;
+        var epsilon = 0.005f;
         var mu = 2f;
 
         var normal = point.getNormal().normalize();
