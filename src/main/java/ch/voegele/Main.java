@@ -63,15 +63,19 @@ public class Main extends Application {
     }
 
     private static Scene setupCornellBox() {
+        //create a scene with an eye and lookAt Vector and FOV in degrees
         var scene = new Scene(new Vec3(0, 0, -4), new Vec3(0, 0, 6), 36);
+        //add shiny spheres
         scene.addSphereShiny(new Vec3(-1001, 0, 0), 1000, new Vec3(0.3, 0, 0), Vec3.ONE);
         scene.addSphereShiny(new Vec3(1001, 0, 0), 1000, new Vec3(0, 0, 0.3), Vec3.ONE);
         scene.addSphereShiny(new Vec3(0, 0, 1001), 1000, new Vec3(0.1, 0.1, 0.1), Vec3.ONE);
         scene.addSphereShiny(new Vec3(0, 1001, 0), 1000, new Vec3(0.1, 0.1, 0.1), Vec3.ONE);
+        //add emissive spheres
         scene.addSphereEmmissive(new Vec3(0, -1001, 0), 1000, new Vec3(0.8, 0.8, 0.8), Vec3.ONE.scale(4f));
 
         scene.addSphereShiny(new Vec3(-0.6, 0.7, -0.6), 0.3f, new Vec3(0.42, 0.42, 0), Vec3.ONE);
         try {
+            //create a sphere with a texture
             var fireTexure = new SphereSphericalTextureMapping("earth.tif");
             scene.addSphereTextureShiny(new Vec3(0.3, 0.3, -0.3), 0.6f, fireTexure, Vec3.ONE);
         } catch (IOException e) {
