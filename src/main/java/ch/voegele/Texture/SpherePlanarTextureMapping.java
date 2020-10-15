@@ -1,11 +1,9 @@
 package ch.voegele.Texture;
 
-import ch.voegele.Point;
+import ch.voegele.Renderer.Point;
 import ch.voegele.util.MathUtilities;
 import ch.voegele.util.Vec3;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class SpherePlanarTextureMapping extends AbstractBitmapTexture implements ITextureMapper {

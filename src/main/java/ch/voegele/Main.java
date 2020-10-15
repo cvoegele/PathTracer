@@ -1,5 +1,7 @@
 package ch.voegele;
 
+import ch.voegele.Renderer.Scene;
+import ch.voegele.Renderer.SceneRenderer;
 import ch.voegele.Texture.SphereSphericalTextureMapping;
 import ch.voegele.util.Vec3;
 import javafx.application.Application;
@@ -7,7 +9,6 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 public class Main extends Application {
 
@@ -53,7 +54,7 @@ public class Main extends Application {
         }
 
         //create Render
-        toRender = new SceneRenderer(512, 512, numberOfThreads, sampleRate, bounces, true);
+        toRender = new SceneRenderer(512, 512, numberOfThreads, sampleRate, true);
         //set scene to render
         //toRender.setScene(setupSkyBoxScene());
         //toRender.setScene(setupCornellBox());

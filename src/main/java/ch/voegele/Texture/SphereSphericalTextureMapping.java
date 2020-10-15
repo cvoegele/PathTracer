@@ -1,6 +1,6 @@
 package ch.voegele.Texture;
 
-import ch.voegele.Point;
+import ch.voegele.Renderer.Point;
 import ch.voegele.util.MathUtilities;
 import ch.voegele.util.Vec3;
 

@@ -1,7 +1,5 @@
-package ch.voegele;
+package ch.voegele.Renderer;
 
-import ch.voegele.Texture.SphereSphericalTextureMapping;
-import ch.voegele.util.Vec2;
 import ch.voegele.util.Vec3;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -19,29 +17,24 @@ import java.util.TimerTask;
 
 public class SceneRenderer {
 
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
-    int numberOfThreads;
-    int sampleRate;
-    int bounces;
+    private int numberOfThreads;
+    private final int sampleRate;
     boolean gaussianAA;
+    Scene scene;
 
+    WritableImage image;
     private PixelWriter writer;
     private Vec3[][] imageArray;
 
-    Scene scene;
-    private Thread[] threads;
-    private long startTime;
-    WritableImage image;
 
-
-    public SceneRenderer(int width, int height, int numberOfThreads, int sampleRate, int bounces, boolean gaussianAA) {
+    public SceneRenderer(int width, int height, int numberOfThreads, int sampleRate, boolean gaussianAA) {
         this.width = width;
         this.height = height;
         this.numberOfThreads = numberOfThreads;
         this.sampleRate = sampleRate;
-        this.bounces = bounces;
         this.gaussianAA = gaussianAA;
     }
 
@@ -52,11 +45,10 @@ public class SceneRenderer {
     public javafx.scene.Scene startRender() {
         if (scene == null) throw new NullPointerException("Scene was not set!");
 
-        startTime = System.currentTimeMillis();
-
-        image = new WritableImage(width, height);
+        var image = new WritableImage(width, height);
         imageArray = new Vec3[width][height];
         ImageView view = new ImageView(image);
+        writer = image.getPixelWriter();
 
         Timer timer = new Timer();
         new Thread(() -> {
@@ -76,7 +68,7 @@ public class SceneRenderer {
     }
 
     private void renderScene() throws InterruptedException {
-        writer = image.getPixelWriter();
+
 
         RenderEngine renderer = new RenderEngine(scene.getEye(), scene.getLookAt(), scene.getFOV());
         imageArray = new Vec3[height][width];
@@ -90,7 +82,7 @@ public class SceneRenderer {
             lostRows = height - parts * numberOfThreads;
             numberOfThreads++;
         }
-        threads = new Thread[numberOfThreads];
+        Thread[] threads = new Thread[numberOfThreads];
         //st
         if (lostRows != 0) {
             var start = parts * (numberOfThreads - 1);

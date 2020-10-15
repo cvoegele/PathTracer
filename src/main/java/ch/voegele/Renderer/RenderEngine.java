@@ -1,4 +1,4 @@
-package ch.voegele;
+package ch.voegele.Renderer;
 
 import ch.voegele.util.Vec2;
 import ch.voegele.util.Vec3;

@@ -1,5 +1,6 @@
-package ch.voegele;
+package ch.voegele.Renderer;
 
+import ch.voegele.Renderer.ISceneElement;
 import ch.voegele.Texture.ITextureMapper;
 import ch.voegele.util.Vec3;
 import ch.voegele.util.VectorHelpers;

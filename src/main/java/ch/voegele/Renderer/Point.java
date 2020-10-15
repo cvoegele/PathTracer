@@ -1,4 +1,4 @@
-package ch.voegele;
+package ch.voegele.Renderer;
 
 public class Point {
     public final int i1, i2;
