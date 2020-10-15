@@ -121,7 +121,7 @@ public class SceneRenderer {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         for (int v = 0; v < height; v++) {
             for (int u = 0; u < width; u++) {
-                var finalColor = observableImage.getPixel(v, u);
+                var finalColor = observableImage.getPixel(u, v);
                 if (finalColor != null)
                     image.setRGB(u, v, finalColor.toRGB());
             }

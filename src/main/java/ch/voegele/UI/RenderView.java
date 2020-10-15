@@ -6,14 +6,15 @@ import ch.voegele.Texture.SphereSphericalTextureMapping;
 import ch.voegele.util.Vec3;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 
 import java.io.IOException;
 
 public class RenderView implements PixelChangeListener {
 
-    WritableImage writableImage;
-    ImageView view;
+    private final PixelWriter writer;
+    private final ImageView view;
 
     public RenderView(int width, int height, int numberOfThreads, int sampleRate, boolean gaussianAA) {
 
@@ -23,11 +24,13 @@ public class RenderView implements PixelChangeListener {
 
         //set scene to render
         //toRender.setScene(setupSkyBoxScene());
-        toRender.setScene(setupCornellBox());
+        //toRender.setScene(setupCornellBox());
         //toRender.setScene(setupGaussScene());
+        toRender.setScene(setupUniverse());
 
-        writableImage = new WritableImage(width, height);
+        WritableImage writableImage = new WritableImage(width, height);
         view = new ImageView(writableImage);
+        writer = writableImage.getPixelWriter();
         toRender.startRender();
     }
 
@@ -81,11 +84,37 @@ public class RenderView implements PixelChangeListener {
         return scene;
     }
 
+    private static Scene setupUniverse() {
+        var scene = new Scene(new Vec3(0, -3, -3), new Vec3(0, 0, 0), 36);
+
+        try {
+
+            var nightSkyTexture = new SphereSphericalTextureMapping("nightsky.jpg");
+            scene.addSphereTextureDiffuse(new Vec3(0, 0, 0), 10, nightSkyTexture);
+
+            scene.addSphereEmmissive(new Vec3(0.4, -2, 10), 0.7f, Vec3.ONE, Vec3.ONE.scale(50));
+
+            var earthTexture = new SphereSphericalTextureMapping("earth.tif");
+            scene.addSphereTextureDiffuse(new Vec3(0.3, 0.3, -0.3), 0.6f, earthTexture);
+
+            var moonTexture = new SphereSphericalTextureMapping("moon.tif");
+            scene.addSphereTextureShiny(new Vec3(0.855, -0.5, -0.855), 0.1f, moonTexture, Vec3.ONE);
+
+            var jupiterTexture = new SphereSphericalTextureMapping("jupiter.tif");
+            scene.addSphereTextureDiffuse(new Vec3(-1, -1, -0.5), 1f, jupiterTexture);
+
+
+            scene.addSphereEmmissive(new Vec3(3, 0, -3), 0.7f, Vec3.ONE, Vec3.ONE.scale(50));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return scene;
+    }
+
     @Override
     public void pixelChanged(int u, int v, Vec3 color) {
-        Platform.runLater(()-> {
-            var writer = writableImage.getPixelWriter();
-            writer.setColor(u, v, color.toColor());
-        });
+        Platform.runLater(() -> writer.setColor(u, v, color.toColor()));
     }
 }

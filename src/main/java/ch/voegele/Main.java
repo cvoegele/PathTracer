@@ -20,8 +20,8 @@ import java.io.IOException;
 public class Main extends Application {
 
     private static WritableImage writableImage;
-    private static int height = 512;
-    private static int width = 512;
+    private static int height = 50;
+    private static int width = 50;
     private static RenderView renderView;
 
     /***
