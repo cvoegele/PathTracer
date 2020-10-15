@@ -16,10 +16,9 @@ public class RenderThread extends Thread {
     private final int sampleRate;
     private final boolean gaussianAAOn;
     private final RenderEngine renderer;
+    private final SceneRenderer sceneRenderer;
     private final Scene scene;
 
-
-    private final Vec3[][] imageArray;
     private final long startTime;
     private final VectorHelpers helpers;
 
@@ -31,8 +30,7 @@ public class RenderThread extends Thread {
                         int sampleRate,
                         boolean gaussianAAOn,
                         RenderEngine renderer,
-                        Scene scene,
-                        Vec3[][] imageArray) {
+                        SceneRenderer sceneRenderer, Scene scene) {
         this.threadNumber = threadNumber;
         this.start = start;
         this.end = end;
@@ -41,8 +39,8 @@ public class RenderThread extends Thread {
         this.sampleRate = sampleRate;
         this.gaussianAAOn = gaussianAAOn;
         this.renderer = renderer;
+        this.sceneRenderer = sceneRenderer;
         this.scene = scene;
-        this.imageArray = imageArray;
         startTime = System.currentTimeMillis();
         helpers = new VectorHelpers(2.2);
     }
@@ -89,7 +87,7 @@ public class RenderThread extends Thread {
                 //gamma correction with gamma of 2.2
                 Vec3 finalColor = helpers.RGBto_sRGB(sum);
 
-                imageArray[u][v] = finalColor;
+                sceneRenderer.observableImage.setPixel(u, v, finalColor);
             }
         }
 

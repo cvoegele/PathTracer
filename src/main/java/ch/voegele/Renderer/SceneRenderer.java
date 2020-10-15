@@ -1,10 +1,10 @@
 package ch.voegele.Renderer;
 
+import ch.voegele.UI.ObservableImage;
 import ch.voegele.util.Vec3;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.VBox;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -25,32 +25,30 @@ public class SceneRenderer {
     boolean gaussianAA;
     Scene scene;
 
-    WritableImage image;
     private PixelWriter writer;
-    private Vec3[][] imageArray;
+    public final ObservableImage observableImage;
 
 
-    public SceneRenderer(int width, int height, int numberOfThreads, int sampleRate, boolean gaussianAA) {
+    public SceneRenderer(int width, int height, int numberOfThreads, int sampleRate, boolean gaussianAA, ObservableImage observableImage) {
         this.width = width;
         this.height = height;
         this.numberOfThreads = numberOfThreads;
         this.sampleRate = sampleRate;
         this.gaussianAA = gaussianAA;
+        this.observableImage = observableImage;
     }
 
     public void setScene(Scene scene) {
         this.scene = scene;
     }
 
-    public javafx.scene.Scene startRender() {
+    public boolean startRender() {
         if (scene == null) throw new NullPointerException("Scene was not set!");
 
         var image = new WritableImage(width, height);
-        imageArray = new Vec3[width][height];
         ImageView view = new ImageView(image);
         writer = image.getPixelWriter();
 
-        Timer timer = new Timer();
         new Thread(() -> {
             try {
                 renderScene();
@@ -58,20 +56,13 @@ public class SceneRenderer {
                 e.printStackTrace();
             }
             saveRenderAsImage();
-            timer.cancel(); // cancel timer
-            new UpdateWindow().run(); //update one last time
         }).start();
 
-        timer.schedule(new UpdateWindow(), 1000, 2000);
-
-        return new javafx.scene.Scene(new VBox(view), width, height);
+        return true;
     }
 
     private void renderScene() throws InterruptedException {
-
-
         RenderEngine renderer = new RenderEngine(scene.getEye(), scene.getLookAt(), scene.getFOV());
-        imageArray = new Vec3[height][width];
 
         //go through all pixels
         var parts = height / numberOfThreads;
@@ -95,8 +86,8 @@ public class SceneRenderer {
                     sampleRate,
                     gaussianAA,
                     renderer,
-                    scene,
-                    imageArray);
+                    this,
+                    scene);
             threads[numberOfThreads - 1].start();
         }
 
@@ -113,8 +104,8 @@ public class SceneRenderer {
                     sampleRate,
                     gaussianAA,
                     renderer,
-                    scene,
-                    imageArray);
+                    this,
+                    scene);
 
             threads[threadNumber].start();
         }
@@ -125,26 +116,14 @@ public class SceneRenderer {
         }
     }
 
-    private class UpdateWindow extends TimerTask {
-        @Override
-        public void run() {
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
-                    var finalColor = imageArray[j][i];
-                    if (finalColor != null)
-                        writer.setColor(j, i, finalColor.toColor());
-                }
-            }
-        }
-    }
 
     private void saveRenderAsImage() {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                var finalColor = imageArray[j][i];
+        for (int v = 0; v < height; v++) {
+            for (int u = 0; u < width; u++) {
+                var finalColor = observableImage.getPixel(v, u);
                 if (finalColor != null)
-                    image.setRGB(j, i, finalColor.toRGB());
+                    image.setRGB(u, v, finalColor.toRGB());
             }
         }
         try {
