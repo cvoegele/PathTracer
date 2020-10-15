@@ -83,72 +83,50 @@ public class SceneRenderer {
 
         //go through all pixels
         var parts = height / numberOfThreads;
-        threads = new Thread[numberOfThreads];
-        for (int partIndex = 0; partIndex < numberOfThreads; partIndex++) {
-            var start = parts * partIndex;
-            var end = parts * partIndex + parts;
 
-            int finalPartIndex = partIndex;
-            threads[partIndex] = new Thread(() -> {
-                //new random instance for every thread
-                Random r = new Random();
-
-                for (int v = start; v < end; v++) {
-                    for (int u = 0; u < width; u++) {
-                        double y = (((double) v / height) * 2) - 1;
-                        double x = (((double) u / width) * 2) - 1;
-
-                        var sigmaX = 1d / width;
-                        var sigmaY = 1d / height;
-
-                        Vec3[] colors = new Vec3[sampleRate];
-                        for (int i = 0; i < sampleRate; i++) {
-
-                            double newX = x, newY = y;
-
-                            if (gaussianAA) {
-                                var xNudge = nextGaussianNormalDistribution(r, sigmaX);
-                                var yNudge = nextGaussianNormalDistribution(r, sigmaY);
-                                 newX += xNudge;
-                                 newY += yNudge;
-                            }
-
-                            Ray ray = renderer.CreateEyeRay(scene.getEye(), scene.getLookAt(), scene.getFOV(), new Vec2(newX, newY));
-
-                            Vec3 color;
-                            if (bounces != -1)
-                                //call with limited bounces
-                                color = renderer.ComputeColor(scene, ray, bounces, 0);
-                            else
-                                //call with probability termination of bounces
-                                color = renderer.ComputeColor(scene, ray);
-
-                            colors[i] = color;
-                        }
-                        Vec3 sum = new Vec3(0, 0, 0);
-                        for (int i = 0; i < sampleRate; i++) {
-                            sum = sum.add(colors[i]);
-                        }
-
-                        var red = sum.x / (double) sampleRate;
-                        var blue = sum.z / (double) sampleRate;
-                        var green = sum.y / (double) sampleRate;
-
-                        red = Math.pow(red, 1 / 2.2d);
-                        blue = Math.pow(blue, 1 / 2.2d);
-                        green = Math.pow(green, 1 / 2.2d);
-
-                        Vec3 finalColor = new Vec3(red * 255, green * 255, blue * 255);
-                        imageArray[u][v] = finalColor;
-                        //writer.setColor(u, v, finalColor.toColor());
-                    }
-                }
-
-                var endTime = System.currentTimeMillis() - startTime;
-                System.out.println("Full time used in Thread " + finalPartIndex + " in s: " + endTime / 1000);
-            });
-            threads[partIndex].start();
+        //enable correction thread if division in threads leaves empty rows
+        var lostRows = 0;
+        if (parts * numberOfThreads < height) {
+            lostRows = height - parts * numberOfThreads;
+            numberOfThreads++;
         }
+        threads = new Thread[numberOfThreads];
+        //st
+        if (lostRows != 0) {
+            var start = parts * (numberOfThreads - 1);
+            var end = start + lostRows - 1;
+            threads[numberOfThreads - 1] = new RenderThread(numberOfThreads - 1,
+                    start,
+                    end,
+                    height,
+                    width,
+                    sampleRate,
+                    gaussianAA,
+                    renderer,
+                    scene,
+                    imageArray);
+            threads[numberOfThreads - 1].start();
+        }
+
+        //start normal threads
+        for (int threadNumber = 0; threadNumber < numberOfThreads - 1; threadNumber++) {
+            var start = parts * threadNumber;
+            var end = parts * threadNumber + parts;
+
+            threads[threadNumber] = new RenderThread(threadNumber,
+                    start,
+                    end,
+                    height,
+                    width,
+                    sampleRate,
+                    gaussianAA,
+                    renderer,
+                    scene,
+                    imageArray);
+
+            threads[threadNumber].start();
+        }
+
 
         for (Thread thread : threads) {
             thread.join();
@@ -184,7 +162,7 @@ public class SceneRenderer {
         }
     }
 
-    private double nextGaussianNormalDistribution(Random r, double sigma) {
+    static double nextGaussianNormalDistribution(Random r, double sigma) {
         var normalGaussian = r.nextGaussian();
         return normalGaussian * sigma;
     }

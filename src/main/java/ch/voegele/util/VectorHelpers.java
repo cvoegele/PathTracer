@@ -4,10 +4,10 @@ import javafx.scene.paint.Color;
 
 public class VectorHelpers {
 
-    private final double GAMMA;
+    private final double gamma;
 
-    public VectorHelpers(double GAMMA) {
-        this.GAMMA = GAMMA;
+    public VectorHelpers(double gamma) {
+        this.gamma = gamma;
     }
 
     public Vec3 lerp(Vec3 v0, Vec3 v1, double t) {
@@ -25,9 +25,9 @@ public class VectorHelpers {
     public Vec3 sRGBtoRGB(Vec3 sRGB) {
         double R1, G1, B1;
 
-        R1 =  Math.pow(sRGB.x / 255d, GAMMA);
-        G1 =  Math.pow(sRGB.y / 255d, GAMMA);
-        B1 =  Math.pow(sRGB.z / 255d, GAMMA);
+        R1 =  Math.pow(sRGB.x / 255d, gamma);
+        G1 =  Math.pow(sRGB.y / 255d, gamma);
+        B1 =  Math.pow(sRGB.z / 255d, gamma);
 
         return new Vec3(R1, G1, B1);
     }
@@ -35,9 +35,9 @@ public class VectorHelpers {
     public Vec3 RGBto_sRGB(Vec3 RGB) {
         double sR, sG, sB;
 
-        sR = Math.pow(RGB.x, 1 / GAMMA) * 255;
-        sG = Math.pow(RGB.y, 1 / GAMMA) * 255;
-        sB = Math.pow(RGB.z, 1 / GAMMA) * 255;
+        sR = Math.pow(RGB.x, 1 / gamma) * 255;
+        sG = Math.pow(RGB.y, 1 / gamma) * 255;
+        sB = Math.pow(RGB.z, 1 / gamma) * 255;
 
         return new Vec3(sR, sG, sB);
     }

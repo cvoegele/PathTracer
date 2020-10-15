@@ -53,11 +53,11 @@ public class Main extends Application {
         }
 
         //create Render
-        toRender = new SceneRenderer(100, 100, numberOfThreads, sampleRate, bounces, false);
+        toRender = new SceneRenderer(512, 512, numberOfThreads, sampleRate, bounces, true);
         //set scene to render
         //toRender.setScene(setupSkyBoxScene());
-        toRender.setScene(setupCornellBox());
-        //toRender.setScene(setupGaussScene());
+        //toRender.setScene(setupCornellBox());
+        toRender.setScene(setupGaussScene());
 
         launch(args);
     }
