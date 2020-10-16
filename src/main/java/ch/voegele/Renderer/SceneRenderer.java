@@ -69,16 +69,17 @@ public class SceneRenderer {
 
         //enable correction thread if division in threads leaves empty rows
         var lostRows = 0;
+        var extraThread =0;
         if (parts * numberOfThreads < height) {
             lostRows = height - parts * numberOfThreads;
-            numberOfThreads++;
+            extraThread++;
         }
-        Thread[] threads = new Thread[numberOfThreads];
+        Thread[] threads = new Thread[numberOfThreads + extraThread];
         //st
         if (lostRows != 0) {
-            var start = parts * (numberOfThreads - 1);
+            var start = parts * (numberOfThreads);
             var end = start + lostRows - 1;
-            threads[numberOfThreads - 1] = new RenderThread(numberOfThreads - 1,
+            threads[numberOfThreads] = new RenderThread(numberOfThreads,
                     start,
                     end,
                     height,
@@ -88,11 +89,11 @@ public class SceneRenderer {
                     renderer,
                     this,
                     scene);
-            threads[numberOfThreads - 1].start();
+            threads[numberOfThreads].start();
         }
 
         //start normal threads
-        for (int threadNumber = 0; threadNumber < numberOfThreads - 1; threadNumber++) {
+        for (int threadNumber = 0; threadNumber < numberOfThreads; threadNumber++) {
             var start = parts * threadNumber;
             var end = parts * threadNumber + parts;
 

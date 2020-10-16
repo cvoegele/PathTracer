@@ -19,9 +19,8 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    private static WritableImage writableImage;
-    private static int height = 50;
-    private static int width = 50;
+    private static int height = 1080;
+    private static int width = 1080;
     private static RenderView renderView;
 
     /***
