@@ -6,6 +6,9 @@ import ch.voegele.util.Vec3;
 
 import java.io.IOException;
 
+/***
+ * spherical mapping on sphere by normal vector
+ */
 public class SphereSphericalTextureMapping extends AbstractBitmapTexture implements ITextureMapper {
 
     public SphereSphericalTextureMapping(String path) throws IOException {

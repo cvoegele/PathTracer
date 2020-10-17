@@ -4,6 +4,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+/***
+ * Abstract Class Implementing storage option for a bitmap texture
+ */
 public abstract class AbstractBitmapTexture {
 
     protected BufferedImage texture;
