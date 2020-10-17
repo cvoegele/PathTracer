@@ -1,35 +1,52 @@
 package ch.voegele.Renderer;
 
-import ch.voegele.Renderer.ISceneElement;
 import ch.voegele.Texture.ITextureMapper;
 import ch.voegele.util.Vec3;
 import ch.voegele.util.VectorHelpers;
 
+/***
+ * Sphere container class. Is used to create scenes for the renderer
+ */
 public class Sphere implements ISceneElement {
 
+    /***
+     * position of sphere in world coordinates
+     */
     private final Vec3 position;
+
+    /***
+     * radius of sphere
+     */
     private final float radius;
-    private final Vec3 color;
+
+    /***
+     * diffuse color of sphere
+     */
+    private final Vec3 diffuse;
+
+    /***
+     * emissive color of sphere
+     */
     private final Vec3 Emission;
+
+    /***
+     * specular color of sphere
+     */
     private final Vec3 specularColor;
+
+    /**
+     * TextureMapper containing the texture and mapping strategy of any texture
+     */
     private ITextureMapper textureMapper;
+
     private VectorHelpers helper = new VectorHelpers(2.2);
 
-    public Sphere(Vec3 position, float radius, Vec3 color, Vec3 Emission, Vec3 specularColor) {
+    public Sphere(Vec3 position, float radius, Vec3 diffuse, Vec3 Emission, Vec3 specularColor) {
         this.position = position;
         this.radius = radius;
-        this.color = color;
+        this.diffuse = diffuse;
         this.Emission = Emission;
         this.specularColor = specularColor;
-    }
-
-    @Override
-    public Vec3 getPosition() {
-        return position;
-    }
-
-    public float getRadius() {
-        return radius;
     }
 
 
@@ -42,7 +59,7 @@ public class Sphere implements ISceneElement {
      */
     @Override
     public Vec3 getColor(Vec3 normal) {
-        if (textureMapper == null) return color;
+        if (textureMapper == null) return diffuse;
 
         int value = textureMapper.getColorByNormal(normal);
 
@@ -51,9 +68,24 @@ public class Sphere implements ISceneElement {
         int blue = (value & 0xFF);
 
         var sRGB = new Vec3(red, green, blue);
-        var RGB = helper.sRGBtoRGB(sRGB);
 
-        return RGB;
+        //TODO: Pre do gamma correction and conversion to Vec3 on all pixels to reduce runtime
+        //gamma correct texture value and clamp
+        return helper.sRGBtoRGB(sRGB);
+    }
+
+    @Override
+    public void setTextureMapper(ITextureMapper mapper) {
+        textureMapper = mapper;
+    }
+
+    @Override
+    public Vec3 getPosition() {
+        return position;
+    }
+
+    public float getRadius() {
+        return radius;
     }
 
     public Vec3 getEmission() {
@@ -63,10 +95,4 @@ public class Sphere implements ISceneElement {
     public Vec3 getSpecularColor() {
         return specularColor;
     }
-
-    @Override
-    public void setTextureMapper(ITextureMapper mapper) {
-        textureMapper = mapper;
-    }
-
 }

@@ -1,5 +1,8 @@
 package ch.voegele.Renderer;
 
+/***
+ * 2D Point class with integers as coordinates
+ */
 public class Point {
     public final int i1, i2;
 

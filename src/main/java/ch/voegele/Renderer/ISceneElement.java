@@ -3,8 +3,9 @@ package ch.voegele.Renderer;
 import ch.voegele.Texture.ITextureMapper;
 import ch.voegele.util.Vec3;
 
-import java.io.IOException;
-
+/***
+ * Scene Element interface. All objects in a scene must implement ISceneElement.
+ */
 public interface ISceneElement {
     public Vec3 getColor(Vec3 normal);
 

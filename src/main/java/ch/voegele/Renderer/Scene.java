@@ -6,6 +6,11 @@ import ch.voegele.util.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 
+/***
+ * Builder class for every scene.
+ * Create an empty instance with the eye, lookAt and fieldOfView (FOV)
+ * Then add all elements with the built in methods
+ */
 public class Scene {
 
     private final List<ISceneElement> sceneElements = new ArrayList<>();

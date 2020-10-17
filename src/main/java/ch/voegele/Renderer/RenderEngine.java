@@ -8,15 +8,9 @@ import java.util.Random;
 
 public class RenderEngine {
 
-    private Vec3 eye;
-    private Vec3 lookAt;
-    private double FOV;
     private Random random;
 
-    public RenderEngine(Vec3 eye, Vec3 lookAt, double FOV) {
-        this.eye = eye;
-        this.lookAt = lookAt;
-        this.FOV = FOV;
+    public RenderEngine() {
         random = new Random();
     }
 
@@ -106,7 +100,7 @@ public class RenderEngine {
         var nudge = r.getDirection().scale(-1f * 1f / 1000f);
         closestPoint = closestPoint.add(nudge);
 
-        return new HitPoint(closestPoint, hitObject, lambda, emission, r);
+        return new HitPoint(closestPoint, hitObject, emission, r);
     }
 
     /***
@@ -167,6 +161,7 @@ public class RenderEngine {
      * @param bounce the number of bounce it is on right now. To start render pass 0.
      * @return Vec3 representing Color in LinearRGB (0 ... 1)
      */
+    @Deprecated
     Vec3 ComputeColor(Scene s, Ray r, int bounces, int bounce) {
         HitPoint point = FindClosestHitPoint(s, r);
 
@@ -204,7 +199,7 @@ public class RenderEngine {
 
 
     Vec3 BRDF(HitPoint point, Ray r, Vec3 w) {
-        var epsilon = 0.005f;
+        var epsilon = 0.01f;
         var mu = 2f;
 
         var normal = point.getNormal().normalize();

@@ -2,19 +2,36 @@ package ch.voegele.Renderer;
 
 import ch.voegele.util.Vec3;
 
+/***
+ * hit point class
+ */
 public class HitPoint {
 
+    /***
+     * position of the hit point in world coordinates
+     */
     private final Vec3 position;
+
+    /***
+     * reference to the element hit in the scene
+     */
     private final ISceneElement hitObject;
-    private final double lambda;
+
+
+    /***
+     * emission of hit object
+     */
     private final Vec3 emission;
+
+    /***
+     * Ray with which the intersection was calculated
+     */
     private final Ray ray;
 
 
-    public HitPoint(Vec3 position, ISceneElement hitObject, double lambda, Vec3 emission, Ray ray) {
+    public HitPoint(Vec3 position, ISceneElement hitObject, Vec3 emission, Ray ray) {
         this.position = position;
         this.hitObject = hitObject;
-        this.lambda = lambda;
         this.emission = emission;
         this.ray = ray;
     }
@@ -27,9 +44,6 @@ public class HitPoint {
         return hitObject;
     }
 
-    public double getLambda() {
-        return lambda;
-    }
 
     public Vec3 getEmission() {
         return emission;

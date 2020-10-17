@@ -1,8 +1,10 @@
-package ch.voegele.UI;
+package ch.voegele;
 
 import ch.voegele.Renderer.Scene;
 import ch.voegele.Renderer.SceneRenderer;
 import ch.voegele.Texture.SphereSphericalTextureMapping;
+import ch.voegele.UI.ObservableImage;
+import ch.voegele.UI.PixelChangeListener;
 import ch.voegele.util.Vec3;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
@@ -23,10 +25,10 @@ public class RenderView implements PixelChangeListener {
         SceneRenderer toRender = new SceneRenderer(width, height, numberOfThreads, sampleRate, gaussianAA, observableImage);
 
         //set scene to render
-        //toRender.setScene(setupSkyBoxScene());
+        toRender.setScene(setupSkyBoxScene());
         //toRender.setScene(setupCornellBox());
         //toRender.setScene(setupGaussScene());
-        toRender.setScene(setupUniverse());
+        //toRender.setScene(setupUniverse());
 
         WritableImage writableImage = new WritableImage(width, height);
         view = new ImageView(writableImage);
@@ -70,7 +72,7 @@ public class RenderView implements PixelChangeListener {
 
     private static Scene setupSkyBoxScene() {
         var scene = new Scene(new Vec3(0, -3, -3), new Vec3(0, 0, 0), 36);
-        scene.addSphereShiny(new Vec3(0, 1001, 0), 1000, Vec3.ZERO, Vec3.ONE); //ground
+        //scene.addSphereShiny(new Vec3(0, 1001, 0), 1000, Vec3.ZERO, Vec3.ONE); //ground
 
         //add skybox
         try {

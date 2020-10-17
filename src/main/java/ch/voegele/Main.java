@@ -1,26 +1,16 @@
 package ch.voegele;
 
-import ch.voegele.Renderer.Scene;
-import ch.voegele.Renderer.SceneRenderer;
-import ch.voegele.Texture.SphereSphericalTextureMapping;
-import ch.voegele.UI.ObservableImage;
-import ch.voegele.UI.PixelChangeListener;
-import ch.voegele.UI.RenderView;
-import ch.voegele.util.Vec3;
 import javafx.application.Application;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
-import java.io.IOException;
-
 public class Main extends Application {
 
-    private static int height = 1080;
-    private static int width = 1080;
+    private static WritableImage writableImage;
+    private static int height = 1000;
+    private static int width = 1000;
     private static RenderView renderView;
 
     /***

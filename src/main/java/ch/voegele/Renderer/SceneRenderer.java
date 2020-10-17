@@ -1,7 +1,6 @@
 package ch.voegele.Renderer;
 
 import ch.voegele.UI.ObservableImage;
-import ch.voegele.util.Vec3;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -12,8 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SceneRenderer {
 
@@ -42,7 +39,7 @@ public class SceneRenderer {
         this.scene = scene;
     }
 
-    public boolean startRender() {
+    public void startRender() {
         if (scene == null) throw new NullPointerException("Scene was not set!");
 
         var image = new WritableImage(width, height);
@@ -58,11 +55,10 @@ public class SceneRenderer {
             saveRenderAsImage();
         }).start();
 
-        return true;
     }
 
     private void renderScene() throws InterruptedException {
-        RenderEngine renderer = new RenderEngine(scene.getEye(), scene.getLookAt(), scene.getFOV());
+        RenderEngine renderer = new RenderEngine();
 
         //go through all pixels
         var parts = height / numberOfThreads;
