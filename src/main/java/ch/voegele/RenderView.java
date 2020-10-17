@@ -13,11 +13,30 @@ import javafx.scene.image.WritableImage;
 
 import java.io.IOException;
 
+/***
+ * RenderView that creates a SceneRenderer, that then renders the Image with a given RenderEngine
+ *
+ */
 public class RenderView implements PixelChangeListener {
 
+    /***
+     * Pixel writer to save write pixels to ImageView
+     */
     private final PixelWriter writer;
+    /***
+     * javafx.ImageView to show image in gui
+     */
     private final ImageView view;
 
+    /***
+     * Instantiate RenderView with parameters and start render process
+     *
+     * @param width of rendered image
+     * @param height of rendered image
+     * @param numberOfThreads number of threads to calculate the image
+     * @param sampleRate number of rays to shoot at every pixel
+     * @param gaussianAA whether gaussian Anti-Aliasing is turned on or off
+     */
     public RenderView(int width, int height, int numberOfThreads, int sampleRate, boolean gaussianAA) {
 
         var observableImage = new ObservableImage(height, width);
@@ -36,9 +55,17 @@ public class RenderView implements PixelChangeListener {
         toRender.startRender();
     }
 
+    /***
+     * get view to present as ImageView in any javafx application
+     * @return ImageView with rendered/currently rendering image
+     */
     public ImageView getView() {
         return view;
     }
+
+    /*
+    the coming methods all just setup different scenes, with the Scene Builder class. On could put this somewhere else, but for now its here.
+     */
 
     private static Scene setupGaussScene() {
         var scene = new Scene(new Vec3(0, -3, -3), new Vec3(0, 0, 0), 36);
@@ -115,6 +142,12 @@ public class RenderView implements PixelChangeListener {
         return scene;
     }
 
+    /***
+     * Implementation of listener
+     * @param u horizontal coordinate on image
+     * @param v vertical coordinate on image
+     * @param color color to set in image (gamma corrected sRGB)
+     */
     @Override
     public void pixelChanged(int u, int v, Vec3 color) {
         Platform.runLater(() -> writer.setColor(u, v, color.toColor()));

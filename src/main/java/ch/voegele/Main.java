@@ -6,9 +6,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
+/***
+ * Main class that initiates the RenderView
+ * Set here:
+ * - width
+ * - height
+ * - numberOfThreads (can be set via command line)
+ * - sampleRate (can be set via command line)
+ * - gaussian on or Off
+ */
 public class Main extends Application {
 
-    private static WritableImage writableImage;
     private static int height = 1000;
     private static int width = 1000;
     private static RenderView renderView;
